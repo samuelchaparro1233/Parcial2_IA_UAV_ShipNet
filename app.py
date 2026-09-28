@@ -469,21 +469,23 @@ def get_evaluator():
 evaluator = get_evaluator()
 
 def browse_directory_native():
+    """Abre el explorador de carpetas nativo en un subproceso aislado para garantizar ejecución en el hilo principal."""
     try:
-        import tkinter as tk
-        from tkinter import filedialog
-        root = tk.Tk()
-        root.withdraw()
-        root.lift()
-        root.attributes('-topmost', True)
-        root.focus_force()
-        folder = filedialog.askdirectory(master=root, title="Selecciona la carpeta con imágenes de prueba")
-        root.destroy()
-        if folder:
-            return os.path.normpath(os.path.abspath(folder))
-        return ""
+        import subprocess
+        script_path = os.path.abspath(os.path.join('scripts', 'browse_folder.py'))
+        if os.path.exists(script_path):
+            res = subprocess.run(
+                [sys.executable, script_path],
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+            chosen = res.stdout.strip()
+            if chosen and os.path.isdir(chosen):
+                return os.path.normpath(chosen)
     except Exception as e:
-        return ""
+        print("Error en explorador nativo:", e)
+    return ""
 
 def compute_optical_views(img_pil):
     """Calcula 4 representaciones ópticas: RGB, Infrarrojo Falso Color, Bordes Sobel y Heatmap."""
@@ -794,26 +796,23 @@ with tabs[0]:
         source_type = "folder"
 
     elif load_mode == "📂 Explorar / Ingresar Carpeta Local en Disco":
-        if 'text_folder_path' not in st.session_state:
-            st.session_state['text_folder_path'] = os.path.abspath('test_eval')
+        if 'selected_folder_path' not in st.session_state:
+            st.session_state['selected_folder_path'] = os.path.abspath('test_eval')
 
         col_p1, col_p2, col_p3 = st.columns([3.2, 1.1, 1.7])
         with col_p1:
             target_folder = st.text_input(
                 "Ruta de la carpeta de imágenes:",
-                value=st.session_state['text_folder_path'],
-                key="text_folder_path_input",
+                key="selected_folder_path",
                 help="Escribe o pega la ruta completa de la carpeta con imágenes en tu disco"
             )
-            # Mantener sincronizado el estado
-            st.session_state['text_folder_path'] = target_folder
         with col_p2:
             st.write("")
             st.write("")
             if st.button("📂 Examinar..."):
                 chosen_dir = browse_directory_native()
                 if chosen_dir:
-                    st.session_state['text_folder_path'] = chosen_dir
+                    st.session_state['selected_folder_path'] = chosen_dir
                     st.session_state['force_inference'] = True
                     st.rerun()
         with col_p3:
