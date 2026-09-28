@@ -14,6 +14,12 @@
 **Modelo Propio:** `UAVShipNet` (Red Neuronal Convolucional implementada desde cero en PyTorch)  
 **Entorno Operativo:** Monitoreo Autónomo de la Flota Mercante del Puerto de Rotterdam  
 
+<p align="center">
+  <img src="assets/gui_interface_preview.png" width="950" alt="Interfaz Gráfica Streamlit - UAV ShipNet Telemetría y Detección">
+  <br>
+  <em>Panel de Control y Telemetría en Tiempo Real con branding institucional UMNG, KPIs operacionales, matriz de confusión y galería de inferencia ciega.</em>
+</p>
+
 ---
 
 ## 1. Contexto Mecatrónico y Justificación Operacional
@@ -45,6 +51,12 @@ Para garantizar la máxima integridad científica y evitar cualquier fuga de dat
 
 * **Selección Temática Rotterdam:** Se priorizaron barcos comerciales (portacontenedores, graneleros, petroleros, metaneros GNL y barcazas del Rin), excluyendo por completo embarcaciones de guerra (portaaviones, destructores, fragatas y submarinos).
 
+<p align="center">
+  <img src="assets/dataset_samples.png" width="950" alt="Muestras del Dataset - Embarcaciones Mercantes vs Fondos No-Barco">
+  <br>
+  <em>Figura 1: Muestras del dataset a resolución espectral 80×80 px RGB. Fila superior (Clase Barco = 1): buques mercantes representativos del Puerto de Rotterdam. Fila inferior (Clase No-Barco = 0): fondos de mar abierto, espigones, oleaje y dársenas portuarias.</em>
+</p>
+
 ---
 
 ## 3. Arquitectura Propia `UAVShipNet` (PyTorch)
@@ -65,6 +77,14 @@ Diseñada desde cero bajo restricciones de bajo peso y alta velocidad para compu
 | :--- | :---: | :--- | :---: |
 | **C1. Metodología y Técnicas de Optimización ML** | 50% | **SO1 / RAE-140:** Uso de técnicas de ML para optimizar el desempeño mecatrónico. | **E1 y E2:** UI interactiva, optimizador AdamW, Cosine Annealing, Data Augmentation ortogonal (0°, 90°, 180°, 270°). |
 | **C2. Evaluación, Validación Cruzada e Inferencia en Vivo** | 50% | **SO6 / RAE-144:** Inferencias sobre el desempeño con pruebas y métricas cuantitativas. | **E3 y E4:** Inferencia en vivo sobre carpeta ciega, matriz de confusión, accuracy en tiempo real y latencia sub-milimétrica. |
+
+### Curvas de Aprendizaje y Dinámica de Optimización
+
+<p align="center">
+  <img src="assets/training_curves.png" width="900" alt="Curvas de Entrenamiento - Binary Cross-Entropy Loss y Accuracy">
+  <br>
+  <em>Figura 2: Dinámica de convergencia durante 30 épocas con AdamW y decaimiento por coseno. Estabilidad asintótica de la pérdida BCE (0.134) y convergencia de validación al 94.83%, garantizando alta capacidad de generalización sin sobreajuste.</em>
+</p>
 
 ### Resultados en la Carpeta Ciega (`test_eval/` con $\theta = 0.50$ Estándar):
 
@@ -117,13 +137,16 @@ run_app.bat
 │
 ├── assets/
 │   ├── logo_umng.png           # Escudo oficial de la UMNG (alta resolución)
-│   └── logo_umng.svg           # Escudo vectorial UMNG
+│   ├── logo_umng.svg           # Escudo vectorial UMNG
+│   ├── gui_interface_preview.png # Captura del panel de telemetría y dashboard Streamlit
+│   ├── dataset_samples.png     # Mosaico de muestras del dataset de embarcaciones
+│   └── training_curves.png     # Curvas de aprendizaje (BCE Loss y Accuracy)
 │
 ├── models/
 │   └── uav_shipnet_best.pt     # Checkpoint entrenado de UAVShipNet (PyTorch)
 │
 ├── reports/
-│   ├── training_curves.png     # Curvas de aprendizaje (BCE Loss y Accuracy)
+│   ├── training_curves.png     # Curvas de aprendizaje exportadas
 │   └── cnn_metrics_report.json # Reporte cuantitativo de métricas
 │
 ├── src/
