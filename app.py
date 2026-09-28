@@ -796,6 +796,10 @@ with tabs[0]:
         source_type = "folder"
 
     elif load_mode == "📂 Explorar / Ingresar Carpeta Local en Disco":
+        # Sincronizar selección pendiente antes de instanciar el widget de texto
+        if 'pending_folder_path' in st.session_state:
+            st.session_state['selected_folder_path'] = st.session_state.pop('pending_folder_path')
+
         if 'selected_folder_path' not in st.session_state:
             st.session_state['selected_folder_path'] = os.path.abspath('test_eval')
 
@@ -812,7 +816,7 @@ with tabs[0]:
             if st.button("📂 Examinar..."):
                 chosen_dir = browse_directory_native()
                 if chosen_dir:
-                    st.session_state['selected_folder_path'] = chosen_dir
+                    st.session_state['pending_folder_path'] = chosen_dir
                     st.session_state['force_inference'] = True
                     st.rerun()
         with col_p3:
