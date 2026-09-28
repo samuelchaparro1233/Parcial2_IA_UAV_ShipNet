@@ -1,0 +1,31 @@
+# Python y Entornos Virtuales
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Datasets masivos en crudo (para no saturar el repositorio)
+data/raw/
+data/fgsc23_backup/
+*.zip
+
+# Preservar catalogo de metadatos y particiones reproducibles
+!data/*.csv
+
+# Preservar la carpeta de prueba para ejecucion inmediata
+!test_eval/
+!test_eval/*.png
+
+# Preservar pesos del modelo entrenado y reportes
+!models/uav_shipnet_best.pt
+!reports/*
+
+# Archivos de configuracion de IDE y Sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
