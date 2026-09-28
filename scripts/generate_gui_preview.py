@@ -7,18 +7,18 @@ from PIL import Image
 
 os.makedirs('assets', exist_ok=True)
 
-# Crear figura de alta definicion (16:9 aspecto, estilo dark dashboard aeroespacial UMNG)
-fig = plt.figure(figsize=(16, 9.8), facecolor='#030712')
+# Crear figura de alta definicion (16:9 aspecto, estilo dark dashboard aeroespacial purpurizado/azulado UMNG)
+fig = plt.figure(figsize=(16, 9.8), facecolor='#07040f')
 gs = gridspec.GridSpec(4, 4, figure=fig, height_ratios=[1.2, 0.45, 1.9, 2.6], hspace=0.32, wspace=0.22)
 
 # 1. Encabezado Hero Header (Fila 0, Columna 0 a 3)
 ax_header = fig.add_subplot(gs[0, :])
-ax_header.set_facecolor('#081024')
+ax_header.set_facecolor('#120b2a')
 ax_header.set_xticks([])
 ax_header.set_yticks([])
 for spine in ax_header.spines.values():
-    spine.set_edgecolor('#00f0ff')
-    spine.set_linewidth(1.2)
+    spine.set_edgecolor('#a855f7')
+    spine.set_linewidth(1.4)
 
 # Colocar logo UMNG en el header
 if os.path.exists('assets/logo_umng.png'):
@@ -35,91 +35,94 @@ ax_header.text(0.11, 0.16, "● EN LÍNEA  |  MODELO: UAVShipNet (PyTorch 599k p
 
 # 2. Cinta de Telemetría de Misión UAV (Fila 1, Columna 0 a 3)
 ax_ribbon = fig.add_subplot(gs[1, :])
-ax_ribbon.set_facecolor('#060e1c')
+ax_ribbon.set_facecolor('#0d0822')
 ax_ribbon.set_xticks([])
 ax_ribbon.set_yticks([])
 for spine in ax_ribbon.spines.values():
-    spine.set_edgecolor('#00f0ff')
-    spine.set_linewidth(0.8)
+    spine.set_edgecolor('#6366f1')
+    spine.set_linewidth(0.9)
     spine.set_linestyle('--')
 
 telemetry_str = "[COORD: 51°55'18\"N, 4°29'42\"E ROTTERDAM]  |  [UAV: AeroQuad-UMNG Mk.IV]  |  [ALT: 120m AGL (PlanetScope 3m GSD)]  |  [BAT: 94%]  |  [LINK: 99.8%]  |  [AI: JETSON ORIN 1.1 ms]"
-ax_ribbon.text(0.5, 0.35, telemetry_str, color='#cbd5e1', fontsize=9, fontweight='bold', fontfamily='monospace', ha='center', transform=ax_ribbon.transAxes)
+ax_ribbon.text(0.5, 0.35, telemetry_str, color='#e0e7ff', fontsize=9, fontweight='bold', fontfamily='monospace', ha='center', transform=ax_ribbon.transAxes)
 
 # 3. Tarjetas de Telemetría KPIs (Fila 2, Cuadrícula de 4 bloques MFD)
 kpis = [
     ("ACCURACY GLOBAL", "99.50%", "CUMPLE ABET N5 (≥98.0%)", "#10b981"),
     ("PRECISIÓN (PRECISION)", "99.00%", "TP/(TP+FP) - Falsa Alarma: 1", "#00f0ff"),
     ("SENSIBILIDAD (RECALL)", "100.00%", "TP/(TP+FN) - Barcos Omitidos: 0", "#f8b133"),
-    ("F1-SCORE ARMÓNICO", "99.50%", "Media Armónica P y R", "#a855f7")
+    ("F1-SCORE ARMÓNICO", "99.50%", "Media Armónica P y R", "#c084fc")
 ]
 
 for idx, (label, val, sub, col) in enumerate(kpis):
     ax_kpi = fig.add_subplot(gs[2, idx])
-    ax_kpi.set_facecolor('#081226')
+    ax_kpi.set_facecolor('#120b2a')
     ax_kpi.set_xticks([])
     ax_kpi.set_yticks([])
     for spine in ax_kpi.spines.values():
         spine.set_edgecolor(col)
         spine.set_linewidth(1.8)
     
-    ax_kpi.text(0.5, 0.78, label, color='#94a3b8', fontsize=9.5, fontweight='bold', ha='center', transform=ax_kpi.transAxes)
+    ax_kpi.text(0.5, 0.78, label, color='#a5b4fc', fontsize=9.5, fontweight='bold', ha='center', transform=ax_kpi.transAxes)
     ax_kpi.text(0.5, 0.40, val, color=col, fontsize=24, fontweight='bold', fontfamily='monospace', ha='center', transform=ax_kpi.transAxes)
     ax_kpi.text(0.5, 0.14, sub, color='#cbd5e1', fontsize=8.2, fontweight='600', ha='center', transform=ax_kpi.transAxes)
 
 # 4. Sección Inferior: Matriz de Confusión + Radar + Analizador Multiespectral (Fila 3)
 # Subplot 3, Columna 0: Radar Scope Táctico
 ax_radar = fig.add_subplot(gs[3, 0])
-ax_radar.set_facecolor('#040914')
+ax_radar.set_facecolor('#0a0618')
 ax_radar.set_xticks([])
 ax_radar.set_yticks([])
 for spine in ax_radar.spines.values():
-    spine.set_edgecolor('#00f0ff')
-    spine.set_linewidth(1)
+    spine.set_edgecolor('#a855f7')
+    spine.set_linewidth(1.2)
 
 # Dibujar circulos concentricos de radar
 theta = np.linspace(0, 2*np.pi, 200)
 for r in [0.3, 0.6, 0.9]:
-    ax_radar.plot(0.5 + r*0.45*np.cos(theta), 0.5 + r*0.45*np.sin(theta), color='#00f0ff', alpha=0.35, linestyle=':')
-ax_radar.plot([0.5, 0.5], [0.05, 0.95], color='#00f0ff', alpha=0.3)
-ax_radar.plot([0.05, 0.95], [0.5, 0.5], color='#00f0ff', alpha=0.3)
+    ax_radar.plot(0.5 + r*0.45*np.cos(theta), 0.5 + r*0.45*np.sin(theta), color='#a855f7', alpha=0.35, linestyle=':')
+ax_radar.plot([0.5, 0.5], [0.05, 0.95], color='#818cf8', alpha=0.3)
+ax_radar.plot([0.05, 0.95], [0.5, 0.5], color='#818cf8', alpha=0.3)
 
 # Haz de barrido y blancos
 sweep_angle = np.pi / 4
 ax_radar.plot([0.5, 0.5 + 0.45*np.cos(sweep_angle)], [0.5, 0.5 + 0.45*np.sin(sweep_angle)], color='#00f0ff', linewidth=2.5, alpha=0.9)
 # Blips de barcos detectados
 ax_radar.scatter([0.62, 0.38, 0.70], [0.65, 0.35, 0.42], color='#10b981', s=60, zorder=5)
-ax_radar.scatter([0.5], [0.5], color='#00f0ff', s=40, zorder=6)
+ax_radar.scatter([0.5], [0.5], color='#c084fc', s=40, zorder=6)
 ax_radar.text(0.5, 0.04, "RADAR AIS 360° (3 BLIPS LOCK)", color='#00f0ff', fontsize=8.5, fontweight='bold', fontfamily='monospace', ha='center', transform=ax_radar.transAxes)
 ax_radar.text(0.5, 0.92, "CONSOLA TÁCTICA HUD", color='#f8b133', fontsize=9, fontweight='bold', ha='center', transform=ax_radar.transAxes)
 
 # Subplot 3, Columna 1: Matriz de Confusión
 ax_cm = fig.add_subplot(gs[3, 1])
-ax_cm.set_facecolor('#040914')
+ax_cm.set_facecolor('#0a0618')
 cm_data = np.array([[99, 1], [0, 100]])
-ax_cm.matshow(cm_data, cmap='Blues', alpha=0.85)
+ax_cm.matshow(cm_data, cmap='Purples', alpha=0.90)
 for i in range(2):
     for j in range(2):
         ax_cm.text(j, i, f"{cm_data[i, j]}", ha='center', va='center', color='white', fontsize=16, fontweight='bold')
 
 ax_cm.set_xticks([0, 1])
 ax_cm.set_yticks([0, 1])
-ax_cm.set_xticklabels(['No Barco (0)', 'Barco (1)'], color='#cbd5e1', fontsize=8.5, fontweight='bold')
-ax_cm.set_yticklabels(['No Barco (0)', 'Barco (1)'], color='#cbd5e1', fontsize=8.5, fontweight='bold')
-ax_cm.tick_params(colors='#cbd5e1', top=False, bottom=True, labeltop=False, labelbottom=True)
+ax_cm.set_xticklabels(['No Barco (0)', 'Barco (1)'], color='#e0e7ff', fontsize=8.5, fontweight='bold')
+ax_cm.set_yticklabels(['No Barco (0)', 'Barco (1)'], color='#e0e7ff', fontsize=8.5, fontweight='bold')
+ax_cm.tick_params(colors='#a5b4fc', top=False, bottom=True, labeltop=False, labelbottom=True)
 ax_cm.set_xlabel('Predicción UAVShipNet', color='#00f0ff', fontweight='bold', fontsize=8.5)
 ax_cm.set_ylabel('Ground Truth (Real)', color='#00f0ff', fontweight='bold', fontsize=8.5)
-ax_cm.set_title('MATRIZ DE CONFUSIÓN TEST CIEGO', color='#00f0ff', fontsize=9.5, fontweight='bold', pad=8)
+ax_cm.set_title('MATRIZ DE CONFUSIÓN TEST CIEGO', color='#c084fc', fontsize=9.5, fontweight='bold', pad=8)
+for spine in ax_cm.spines.values():
+    spine.set_edgecolor('#a855f7')
+    spine.set_linewidth(1.2)
 
 # Subplot 3, Columnas 2 y 3: Analizador Multiespectral (4 Vistas: RGB, CIR, Sobel, Heatmap)
 ax_multi = fig.add_subplot(gs[3, 2:])
-ax_multi.set_facecolor('#081024')
+ax_multi.set_facecolor('#120b2a')
 ax_multi.set_xticks([])
 ax_multi.set_yticks([])
 for spine in ax_multi.spines.values():
-    spine.set_edgecolor('#38bdf8')
-    spine.set_linewidth(1.2)
-ax_multi.set_title('ANALIZADOR MULTIESPECTRAL (RGB • INFRARROJO CIR • SOBEL • HEATMAP)', color='#38bdf8', fontsize=9.5, fontweight='bold', pad=8)
+    spine.set_edgecolor('#a855f7')
+    spine.set_linewidth(1.4)
+ax_multi.set_title('ANALIZADOR MULTIESPECTRAL (RGB • INFRARROJO CIR • SOBEL • HEATMAP)', color='#00f0ff', fontsize=9.5, fontweight='bold', pad=8)
 
 sub_gs = gridspec.GridSpecFromSubplotSpec(1, 4, subplot_spec=gs[3, 2:], wspace=0.18)
 
@@ -160,7 +163,7 @@ views = [
 
 for idx, (img_view, title_view, col_view) in enumerate(views):
     sub_ax = fig.add_subplot(sub_gs[0, idx])
-    sub_ax.set_facecolor('#040914')
+    sub_ax.set_facecolor('#0a0618')
     sub_ax.imshow(img_view)
     sub_ax.set_title(title_view, color=col_view, fontsize=7.8, fontweight='bold', pad=3)
     sub_ax.set_xticks([])

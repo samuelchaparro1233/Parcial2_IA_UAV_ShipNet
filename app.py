@@ -41,19 +41,25 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
     :root {
-        --bg-main: #030712;
-        --card-bg: rgba(10, 18, 36, 0.85);
-        --card-border: rgba(56, 189, 248, 0.22);
-        --card-border-hover: rgba(0, 240, 255, 0.65);
+        --bg-main: #07040f;
+        --card-bg: rgba(14, 9, 32, 0.90);
+        --card-border: rgba(168, 85, 247, 0.28);
+        --card-border-hover: rgba(0, 240, 255, 0.75);
         --umng-gold: #f8b133;
-        --umng-gold-glow: rgba(248, 177, 51, 0.4);
+        --umng-gold-glow: rgba(248, 177, 51, 0.45);
         --cyber-cyan: #00f0ff;
-        --cyber-cyan-glow: rgba(0, 240, 255, 0.4);
+        --cyber-cyan-glow: rgba(0, 240, 255, 0.45);
+        --electric-purple: #a855f7;
+        --electric-purple-glow: rgba(168, 85, 247, 0.5);
+        --deep-indigo: #6366f1;
+        --deep-indigo-glow: rgba(99, 102, 241, 0.4);
         --emerald-laser: #10b981;
         --emerald-glow: rgba(16, 185, 129, 0.45);
+        --pink-laser: #ec4899;
+        --pink-laser-glow: rgba(236, 72, 153, 0.45);
         --coral-alert: #f43f5e;
         --text-primary: #f8fafc;
-        --text-secondary: #94a3b8;
+        --text-secondary: #a1a1aa;
     }
 
     /* Fuentes y Base */
@@ -62,41 +68,45 @@ st.markdown("""
         color: var(--text-primary);
     }
     
+    /* Fondo Cósmico Purpurizado / Azulado Profundo */
     .stApp {
-        background-color: #030712;
+        background-color: #07040f;
         background-image: 
-            radial-gradient(circle at 10% 15%, rgba(14, 165, 233, 0.08) 0%, transparent 45%),
-            radial-gradient(circle at 90% 85%, rgba(248, 177, 51, 0.06) 0%, transparent 45%),
-            linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-        background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+            radial-gradient(circle at 16% 12%, rgba(139, 92, 246, 0.18) 0%, transparent 48%),
+            radial-gradient(circle at 84% 88%, rgba(14, 165, 233, 0.16) 0%, transparent 52%),
+            radial-gradient(circle at 50% 45%, rgba(99, 102, 241, 0.09) 0%, transparent 62%),
+            linear-gradient(rgba(168, 85, 247, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+        background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
     }
 
-    /* Scrollbars elegantes */
+    /* Scrollbars elegantes purpurizados */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
     }
     ::-webkit-scrollbar-track {
-        background: #030712;
+        background: #07040f;
     }
     ::-webkit-scrollbar-thumb {
-        background: #1e293b;
+        background: #27174a;
         border-radius: 4px;
+        border: 1px solid rgba(168, 85, 247, 0.3);
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: #00f0ff;
+        background: #a855f7;
+        box-shadow: 0 0 10px #a855f7;
     }
 
     /* Hero Command Header */
     .hero-container {
-        background: linear-gradient(135deg, rgba(8, 16, 36, 0.92) 0%, rgba(15, 26, 54, 0.85) 100%);
-        border: 1px solid rgba(0, 240, 255, 0.28);
+        background: linear-gradient(135deg, rgba(16, 10, 38, 0.95) 0%, rgba(26, 14, 56, 0.90) 50%, rgba(10, 16, 42, 0.94) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.38);
         border-radius: 16px;
         padding: 22px 28px;
         margin-bottom: 16px;
-        box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(18px);
+        box-shadow: 0 16px 45px -10px rgba(0, 0, 0, 0.85), 0 0 25px rgba(139, 92, 246, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(20px);
         position: relative;
         overflow: hidden;
     }
@@ -107,20 +117,21 @@ st.markdown("""
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(90deg, #f8b133, #00f0ff, #3b82f6, #10b981);
+        background: linear-gradient(90deg, #f8b133, #a855f7, #00f0ff, #10b981);
     }
     .hero-title {
         font-family: 'Chakra Petch', sans-serif;
-        font-size: 2.15rem;
+        font-size: 2.2rem;
         font-weight: 700;
         letter-spacing: -0.01em;
-        background: linear-gradient(90deg, #38bdf8 0%, #818cf8 45%, #f8b133 100%);
+        background: linear-gradient(90deg, #38bdf8 0%, #c084fc 42%, #f8b133 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 6px;
+        text-shadow: 0 0 30px rgba(192, 132, 252, 0.3);
     }
     .hero-subtitle {
-        color: #94a3b8;
+        color: #cbd5e1;
         font-size: 0.95rem;
         font-weight: 400;
         margin-bottom: 14px;
@@ -129,8 +140,8 @@ st.markdown("""
 
     /* Cinta de Telemetría Táctica del UAV */
     .telemetry-ribbon {
-        background: linear-gradient(90deg, rgba(6, 14, 28, 0.95) 0%, rgba(12, 22, 45, 0.9) 50%, rgba(6, 14, 28, 0.95) 100%);
-        border: 1px solid rgba(0, 240, 255, 0.25);
+        background: linear-gradient(90deg, rgba(14, 8, 34, 0.96) 0%, rgba(22, 12, 50, 0.92) 50%, rgba(8, 16, 38, 0.96) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.35);
         border-radius: 10px;
         padding: 10px 18px;
         margin-bottom: 20px;
@@ -141,28 +152,36 @@ st.markdown("""
         gap: 12px;
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.76rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(0, 240, 255, 0.2);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7), 0 0 15px rgba(139, 92, 246, 0.12), inset 0 1px 0 rgba(168, 85, 247, 0.25);
     }
     .tr-item {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        color: #cbd5e1;
+        color: #e2e8f0;
     }
     .tr-val {
         color: var(--cyber-cyan);
         font-weight: 700;
+        text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+    }
+    .tr-val-purple {
+        color: #c084fc;
+        font-weight: 700;
+        text-shadow: 0 0 8px rgba(192, 132, 252, 0.4);
     }
     .tr-val-gold {
         color: var(--umng-gold);
         font-weight: 700;
+        text-shadow: 0 0 8px rgba(248, 177, 51, 0.4);
     }
     .tr-val-green {
         color: var(--emerald-laser);
         font-weight: 700;
+        text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
     }
     .tr-sep {
-        color: rgba(148, 163, 184, 0.3);
+        color: rgba(168, 85, 247, 0.4);
     }
 
     /* Telemetry Chips / Badges */
@@ -170,21 +189,26 @@ st.markdown("""
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: rgba(10, 18, 38, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: rgba(18, 11, 40, 0.92);
+        border: 1px solid rgba(168, 85, 247, 0.3);
         padding: 5px 12px;
         border-radius: 9999px;
         font-size: 0.76rem;
         font-weight: 600;
-        color: #cbd5e1;
+        color: #e2e8f0;
         letter-spacing: 0.02em;
         margin-right: 6px;
         margin-bottom: 4px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+        transition: all 0.2s ease;
+    }
+    .pill-badge:hover {
+        border-color: #a855f7;
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
     }
     .pill-badge.active-dot {
-        border-color: rgba(16, 185, 129, 0.45);
-        background: rgba(16, 185, 129, 0.12);
+        border-color: rgba(16, 185, 129, 0.5);
+        background: rgba(16, 185, 129, 0.15);
         color: #34d399;
     }
     .live-dot {
@@ -193,7 +217,7 @@ st.markdown("""
         background-color: #10b981;
         border-radius: 50%;
         display: inline-block;
-        box-shadow: 0 0 8px #10b981;
+        box-shadow: 0 0 10px #10b981;
         animation: pulse-dot 2s infinite;
     }
     @keyframes pulse-dot {
@@ -202,14 +226,14 @@ st.markdown("""
         100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
 
-    /* Radar HUD Widget en Sidebar */
+    /* Radar HUD Widget en Sidebar con Brillo Purpurizado/Azulado */
     .radar-hud-box {
-        background: rgba(6, 12, 25, 0.9);
-        border: 1px solid rgba(0, 240, 255, 0.3);
+        background: linear-gradient(180deg, rgba(16, 10, 36, 0.95) 0%, rgba(8, 5, 20, 0.98) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.38);
         border-radius: 12px;
         padding: 12px 8px;
         text-align: center;
-        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.12), inset 0 0 15px rgba(0, 240, 255, 0.04);
+        box-shadow: 0 6px 24px rgba(124, 58, 237, 0.25), inset 0 0 18px rgba(124, 58, 237, 0.1);
         margin-bottom: 16px;
     }
     .radar-scope {
@@ -218,16 +242,16 @@ st.markdown("""
         height: 140px;
         margin: 0 auto 10px auto;
         border-radius: 50%;
-        border: 2px solid #00f0ff;
-        background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, rgba(5, 12, 28, 0.95) 75%);
+        border: 2px solid #a855f7;
+        background: radial-gradient(circle, rgba(168, 85, 247, 0.14) 0%, rgba(8, 4, 24, 0.98) 75%);
         overflow: hidden;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.35);
     }
     .radar-sweep {
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
         border-radius: 50%;
-        background: conic-gradient(from 0deg, rgba(0, 240, 255, 0.5) 0deg, rgba(0, 240, 255, 0) 55deg, transparent 55deg);
+        background: conic-gradient(from 0deg, rgba(0, 240, 255, 0.6) 0deg, rgba(168, 85, 247, 0.3) 30deg, transparent 60deg);
         animation: radar-sweep-spin 3s linear infinite;
     }
     @keyframes radar-sweep-spin {
@@ -239,7 +263,7 @@ st.markdown("""
         top: 50%; left: 50%;
         transform: translate(-50%, -50%);
         border-radius: 50%;
-        border: 1px dashed rgba(0, 240, 255, 0.25);
+        border: 1px dashed rgba(168, 85, 247, 0.35);
     }
     .r-ring-1 { width: 45px; height: 45px; }
     .r-ring-2 { width: 90px; height: 90px; }
@@ -247,13 +271,13 @@ st.markdown("""
         position: absolute;
         top: 50%; left: 0; right: 0;
         height: 1px;
-        background: rgba(0, 240, 255, 0.25);
+        background: rgba(168, 85, 247, 0.3);
     }
     .radar-cross-v {
         position: absolute;
         top: 0; bottom: 0; left: 50%;
         width: 1px;
-        background: rgba(0, 240, 255, 0.25);
+        background: rgba(168, 85, 247, 0.3);
     }
     .radar-center-blip {
         position: absolute;
@@ -262,14 +286,14 @@ st.markdown("""
         background: #00f0ff;
         border-radius: 50%;
         transform: translate(-50%, -50%);
-        box-shadow: 0 0 8px #00f0ff;
+        box-shadow: 0 0 10px #00f0ff;
     }
     .radar-target-dot {
         position: absolute;
         width: 7px; height: 7px;
         background: #10b981;
         border-radius: 50%;
-        box-shadow: 0 0 8px #10b981;
+        box-shadow: 0 0 10px #10b981;
         animation: target-dot-pulse 1.4s ease-in-out infinite alternate;
     }
     .r-dot-1 { top: 32px; left: 40px; }
@@ -280,31 +304,31 @@ st.markdown("""
         to { opacity: 1; transform: scale(1.3); }
     }
 
-    /* KPI Multi-Function Display Cards con Brackets Tácticos */
+    /* KPI Multi-Function Display Cards con Brackets Tácticos Purpurizados */
     .kpi-hud-card {
         position: relative;
-        background: linear-gradient(135deg, rgba(10, 18, 38, 0.92) 0%, rgba(5, 10, 24, 0.96) 100%);
-        border: 1px solid rgba(56, 189, 248, 0.22);
+        background: linear-gradient(135deg, rgba(18, 11, 42, 0.95) 0%, rgba(9, 6, 26, 0.98) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.28);
         border-radius: 12px;
         padding: 14px 10px;
         text-align: center;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.65), 0 0 15px rgba(139, 92, 246, 0.08);
+        backdrop-filter: blur(14px);
         transition: all 0.25s ease;
         overflow: hidden;
     }
     .kpi-hud-card:hover {
         transform: translateY(-3px);
-        border-color: rgba(0, 240, 255, 0.55);
-        box-shadow: 0 10px 25px rgba(0, 240, 255, 0.16);
+        border-color: rgba(168, 85, 247, 0.65);
+        box-shadow: 0 12px 30px rgba(168, 85, 247, 0.25), 0 0 20px rgba(0, 240, 255, 0.15);
     }
     .kpi-hud-card::before {
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0;
         height: 3px;
-        background: var(--kpi-glow, #38bdf8);
-        box-shadow: 0 0 10px var(--kpi-glow, #38bdf8);
+        background: var(--kpi-glow, #a855f7);
+        box-shadow: 0 0 12px var(--kpi-glow, #a855f7);
     }
     .kpi-val {
         font-family: 'JetBrains Mono', monospace;
@@ -313,13 +337,14 @@ st.markdown("""
         letter-spacing: -0.03em;
         line-height: 1.1;
         margin: 6px 0;
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
     }
     .kpi-label {
         font-size: 0.72rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color: #94a3b8;
+        color: #cbd5e1;
     }
     .kpi-status-badge {
         display: inline-block;
@@ -331,49 +356,52 @@ st.markdown("""
         letter-spacing: 0.03em;
     }
     .badge-success {
-        background: rgba(16, 185, 129, 0.15);
+        background: rgba(16, 185, 129, 0.18);
         color: #34d399;
-        border: 1px solid rgba(52, 211, 153, 0.4);
+        border: 1px solid rgba(52, 211, 153, 0.45);
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
     }
     .badge-info {
-        background: rgba(6, 182, 212, 0.15);
+        background: rgba(6, 182, 212, 0.18);
         color: #22d3ee;
-        border: 1px solid rgba(34, 211, 238, 0.4);
+        border: 1px solid rgba(34, 211, 238, 0.45);
+        box-shadow: 0 0 8px rgba(6, 182, 212, 0.2);
     }
     .badge-target-warn {
-        background: rgba(244, 63, 94, 0.15);
+        background: rgba(244, 63, 94, 0.18);
         color: #f43f5e;
-        border: 1px solid rgba(244, 63, 94, 0.4);
+        border: 1px solid rgba(244, 63, 94, 0.45);
+        box-shadow: 0 0 8px rgba(244, 63, 94, 0.2);
     }
 
     /* Galería de Tarjetas con Retícula de Puntería Táctica */
     .gallery-reticle-card {
         position: relative;
-        background: linear-gradient(180deg, rgba(10, 18, 36, 0.9) 0%, rgba(5, 10, 22, 0.96) 100%);
-        border: 1px solid rgba(56, 189, 248, 0.22);
+        background: linear-gradient(180deg, rgba(16, 10, 36, 0.94) 0%, rgba(8, 5, 22, 0.98) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.28);
         border-radius: 12px;
         padding: 9px;
         margin-bottom: 14px;
         text-align: center;
         transition: all 0.25s ease;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(10px);
     }
     .gallery-reticle-card.ship-locked {
-        border-color: rgba(16, 185, 129, 0.45);
-        box-shadow: 0 0 14px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.5);
+        box-shadow: 0 0 16px rgba(16, 185, 129, 0.18);
     }
     .gallery-reticle-card.noship-locked {
-        border-color: rgba(56, 189, 248, 0.3);
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.1);
+        border-color: rgba(56, 189, 248, 0.35);
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.12);
     }
     .gallery-reticle-card:hover {
         transform: translateY(-4px) scale(1.02);
-        box-shadow: 0 12px 28px rgba(0, 240, 255, 0.25);
-        border-color: #00f0ff;
+        box-shadow: 0 12px 30px rgba(168, 85, 247, 0.35), 0 0 20px rgba(0, 240, 255, 0.2);
+        border-color: #c084fc;
     }
     .reticle-corner-tl {
         position: absolute; top: 4px; left: 4px; width: 7px; height: 7px;
-        border-top: 2px solid #00f0ff; border-left: 2px solid #00f0ff;
+        border-top: 2px solid #c084fc; border-left: 2px solid #c084fc;
     }
     .reticle-corner-tr {
         position: absolute; top: 4px; right: 4px; width: 7px; height: 7px;
@@ -385,14 +413,14 @@ st.markdown("""
     }
     .reticle-corner-br {
         position: absolute; bottom: 4px; right: 4px; width: 7px; height: 7px;
-        border-bottom: 2px solid #00f0ff; border-right: 2px solid #00f0ff;
+        border-bottom: 2px solid #c084fc; border-right: 2px solid #c084fc;
     }
     .target-id-badge {
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.68rem;
         font-weight: 700;
         letter-spacing: 0.05em;
-        color: #94a3b8;
+        color: #c084fc;
         margin-bottom: 4px;
     }
     .conf-meter-bar {
@@ -410,12 +438,12 @@ st.markdown("""
 
     /* Cajas Informativas Sidebar */
     .sidebar-spec-box {
-        background: rgba(8, 15, 30, 0.75);
-        border: 1px solid rgba(56, 189, 248, 0.2);
+        background: rgba(15, 10, 36, 0.85);
+        border: 1px solid rgba(168, 85, 247, 0.28);
         border-radius: 10px;
         padding: 12px 14px;
         margin-bottom: 14px;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
 
     /* Botones de Streamlit personalizados */
@@ -423,17 +451,21 @@ st.markdown("""
         border-radius: 8px;
         font-weight: 600;
         transition: all 0.2s ease;
+        background: linear-gradient(135deg, rgba(26, 16, 56, 0.9) 0%, rgba(14, 20, 52, 0.9) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        color: #f8fafc;
     }
     div.stButton > button:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 14px rgba(0, 240, 255, 0.3);
+        border-color: #00f0ff;
+        box-shadow: 0 4px 18px rgba(168, 85, 247, 0.4);
     }
 
-    /* Estilo Tabs */
+    /* Estilo Tabs Purpurizado */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
         background-color: transparent;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        border-bottom: 1px solid rgba(168, 85, 247, 0.25);
         margin-bottom: 20px;
     }
     .stTabs [data-baseweb="tab"] {
@@ -441,20 +473,21 @@ st.markdown("""
         padding: 10px 18px;
         font-weight: 600;
         font-size: 0.92rem;
-        background-color: rgba(10, 18, 38, 0.6);
-        color: #94a3b8;
+        background-color: rgba(16, 11, 38, 0.65);
+        color: #cbd5e1;
         border: 1px solid transparent;
         transition: all 0.2s ease;
     }
     .stTabs [data-baseweb="tab"]:hover {
         color: #f8fafc;
-        background-color: rgba(20, 32, 60, 0.7);
+        background-color: rgba(30, 20, 68, 0.8);
     }
     .stTabs [aria-selected="true"] {
-        color: #00f0ff !important;
-        background: rgba(10, 20, 42, 0.95) !important;
-        border-color: rgba(0, 240, 255, 0.35) rgba(0, 240, 255, 0.35) transparent !important;
-        border-top: 2px solid #00f0ff !important;
+        color: #c084fc !important;
+        background: rgba(20, 13, 46, 0.98) !important;
+        border-color: rgba(168, 85, 247, 0.45) rgba(168, 85, 247, 0.45) transparent !important;
+        border-top: 2px solid #a855f7 !important;
+        box-shadow: 0 -4px 15px rgba(168, 85, 247, 0.2) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -1098,29 +1131,29 @@ with tabs[0]:
 
             with col_cm:
                 cm = np.array(metrics['confusion_matrix'])
-                fig_cm, ax_cm = plt.subplots(figsize=(4.5, 3.4), facecolor='#030712')
-                ax_cm.set_facecolor('#030712')
+                fig_cm, ax_cm = plt.subplots(figsize=(4.5, 3.4), facecolor='#07040f')
+                ax_cm.set_facecolor('#100a26')
                 sns.heatmap(
-                    cm, annot=True, fmt='d', cmap='Blues', cbar=False, ax=ax_cm,
+                    cm, annot=True, fmt='d', cmap='Purples', cbar=False, ax=ax_cm,
                     xticklabels=['No Barco (0)', 'Barco (1)'],
                     yticklabels=['No Barco (0)', 'Barco (1)'],
                     annot_kws={'size': 15, 'weight': 'bold', 'color': 'white'}
                 )
-                ax_cm.tick_params(colors='#94a3b8')
-                ax_cm.set_xlabel('Predicción UAVShipNet', color='#cbd5e1', fontweight='bold')
-                ax_cm.set_ylabel('Ground Truth (Real)', color='#cbd5e1', fontweight='bold')
+                ax_cm.tick_params(colors='#c084fc')
+                ax_cm.set_xlabel('Predicción UAVShipNet', color='#00f0ff', fontweight='bold')
+                ax_cm.set_ylabel('Ground Truth (Real)', color='#00f0ff', fontweight='bold')
                 st.pyplot(fig_cm)
 
             with col_hist:
                 probs_ship = [r['prob_ship'] for r in results]
-                fig_hist, ax_hist = plt.subplots(figsize=(4.5, 3.4), facecolor='#030712')
-                ax_hist.set_facecolor('#030712')
-                ax_hist.hist(probs_ship, bins=20, color='#00f0ff', edgecolor='#0a152e', alpha=0.85)
-                ax_hist.axvline(x=0.50, color='#f43f5e', linestyle='--', linewidth=2, label='Umbral Estándar θ=0.50')
-                ax_hist.tick_params(colors='#94a3b8')
+                fig_hist, ax_hist = plt.subplots(figsize=(4.5, 3.4), facecolor='#07040f')
+                ax_hist.set_facecolor('#100a26')
+                ax_hist.hist(probs_ship, bins=20, color='#a855f7', edgecolor='#221345', alpha=0.85)
+                ax_hist.axvline(x=0.50, color='#00f0ff', linestyle='--', linewidth=2, label='Umbral Estándar θ=0.50')
+                ax_hist.tick_params(colors='#c084fc')
                 ax_hist.set_xlabel('Probabilidad P(Barco)', color='#cbd5e1')
                 ax_hist.set_ylabel('Frecuencia', color='#cbd5e1')
-                ax_hist.legend(facecolor='#0a152e', edgecolor='none', labelcolor='white')
+                ax_hist.legend(facecolor='#180e38', edgecolor='none', labelcolor='white')
                 st.pyplot(fig_hist)
 
             # Resumen analítico de contingencia
@@ -1341,23 +1374,23 @@ with tabs[1]:
 
         with c_diag1:
             arr_rgb = optical['arr']
-            fig_hist_rgb, ax_hr = plt.subplots(figsize=(5, 3.2), facecolor='#030712')
-            ax_hr.set_facecolor('#030712')
-            ax_hr.hist(arr_rgb[:,:,0].ravel(), bins=32, color='#ef4444', alpha=0.65, label='Canal Rojo (R)')
+            fig_hist_rgb, ax_hr = plt.subplots(figsize=(5, 3.2), facecolor='#07040f')
+            ax_hr.set_facecolor('#100a26')
+            ax_hr.hist(arr_rgb[:,:,0].ravel(), bins=32, color='#ec4899', alpha=0.65, label='Canal Rojo (R)')
             ax_hr.hist(arr_rgb[:,:,1].ravel(), bins=32, color='#10b981', alpha=0.65, label='Canal Verde (G)')
-            ax_hr.hist(arr_rgb[:,:,2].ravel(), bins=32, color='#3b82f6', alpha=0.65, label='Canal Azul (B)')
-            ax_hr.tick_params(colors='#94a3b8')
+            ax_hr.hist(arr_rgb[:,:,2].ravel(), bins=32, color='#38bdf8', alpha=0.65, label='Canal Azul (B)')
+            ax_hr.tick_params(colors='#c084fc')
             ax_hr.set_title('Distribución Espectral de Canales RGB', color='#f8fafc', fontsize=10, fontweight='bold')
             ax_hr.set_xlabel('Intensidad Digital (0-255)', color='#cbd5e1', fontsize=8)
             ax_hr.set_ylabel('Conteo de Píxeles', color='#cbd5e1', fontsize=8)
-            ax_hr.legend(facecolor='#0a152e', edgecolor='none', labelcolor='white', fontsize=8)
+            ax_hr.legend(facecolor='#180e38', edgecolor='none', labelcolor='white', fontsize=8)
             st.pyplot(fig_hist_rgb)
 
         with c_diag2:
             m = optical['metrics']
             st.markdown(f"""
-            <div style="background: rgba(10, 18, 38, 0.85); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 12px; padding: 16px;">
-                <div style="font-family: monospace; font-size: 0.85rem; color: #00f0ff; font-weight: 700; margin-bottom: 10px;">
+            <div style="background: rgba(18, 11, 42, 0.92); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 12px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.5);">
+                <div style="font-family: monospace; font-size: 0.85rem; color: #c084fc; font-weight: 700; margin-bottom: 10px;">
                     TELEMETRÍA ÓPTICA CUANTITATIVA
                 </div>
                 <table style="width: 100%; font-size: 0.82rem; color: #cbd5e1; border-collapse: collapse;">
