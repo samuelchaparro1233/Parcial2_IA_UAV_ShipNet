@@ -474,11 +474,15 @@ def browse_directory_native():
         from tkinter import filedialog
         root = tk.Tk()
         root.withdraw()
-        root.wm_attributes('-topmost', 1)
+        root.lift()
+        root.attributes('-topmost', True)
+        root.focus_force()
         folder = filedialog.askdirectory(master=root, title="Selecciona la carpeta con imágenes de prueba")
         root.destroy()
-        return folder
-    except Exception:
+        if folder:
+            return os.path.normpath(os.path.abspath(folder))
+        return ""
+    except Exception as e:
         return ""
 
 def compute_optical_views(img_pil):
@@ -790,28 +794,46 @@ with tabs[0]:
         source_type = "folder"
 
     elif load_mode == "📂 Explorar / Ingresar Carpeta Local en Disco":
-        col_p1, col_p2, col_p3 = st.columns([3, 1, 1])
+        if 'text_folder_path' not in st.session_state:
+            st.session_state['text_folder_path'] = os.path.abspath('test_eval')
+
+        col_p1, col_p2, col_p3 = st.columns([3.2, 1.1, 1.7])
         with col_p1:
-            if 'custom_folder_path' not in st.session_state:
-                st.session_state['custom_folder_path'] = os.path.abspath('test_eval')
             target_folder = st.text_input(
                 "Ruta de la carpeta de imágenes:",
-                value=st.session_state['custom_folder_path'],
-                key="text_folder_path"
+                value=st.session_state['text_folder_path'],
+                key="text_folder_path_input",
+                help="Escribe o pega la ruta completa de la carpeta con imágenes en tu disco"
             )
+            # Mantener sincronizado el estado
+            st.session_state['text_folder_path'] = target_folder
         with col_p2:
             st.write("")
             st.write("")
             if st.button("📂 Examinar..."):
                 chosen_dir = browse_directory_native()
                 if chosen_dir:
-                    st.session_state['custom_folder_path'] = chosen_dir
-                    target_folder = chosen_dir
+                    st.session_state['text_folder_path'] = chosen_dir
+                    st.session_state['force_inference'] = True
                     st.rerun()
         with col_p3:
             st.write("")
             st.write("")
-            execute_inference = st.button("⚡ Ejecutar Inferencia", type="primary", key="btn_browse_folder")
+            execute_inference = st.button("⚡ Cargar y Evaluar", type="primary", key="btn_browse_folder")
+        
+        # Validación en tiempo real de la carpeta ingresada
+        current_check_path = target_folder.strip()
+        if current_check_path:
+            if os.path.isdir(current_check_path):
+                valid_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
+                found_imgs = [f for f in os.listdir(current_check_path) if f.lower().endswith(valid_exts)]
+                if found_imgs:
+                    st.success(f"📁 **Carpeta verificada:** `{current_check_path}` — **{len(found_imgs)}** imágenes detectadas listas para procesar.")
+                else:
+                    st.warning(f"⚠️ La carpeta `{current_check_path}` existe pero no contiene imágenes soportadas (.png, .jpg, .jpeg, .bmp, .tif).")
+            else:
+                st.error(f"❌ La ruta `{current_check_path}` no existe o no es un directorio válido.")
+
         source_type = "folder"
 
     elif load_mode == "📤 Arrastrar y Soltar Archivos (Browse & Drop)":
@@ -821,26 +843,52 @@ with tabs[0]:
             accept_multiple_files=True
         )
         if uploaded_files:
-            st.success(f"{len(uploaded_files)} imágenes cargadas listas para inferencia.")
+            st.success(f"✅ {len(uploaded_files)} imágenes cargadas listas para inferencia.")
             execute_inference = st.button("⚡ Ejecutar Inferencia sobre Archivos", type="primary", key="btn_upload")
         source_type = "upload"
 
-    # Ejecución de inferencia fija a theta = 0.50
+    # Lógica inteligente de disparo de inferencia
     fixed_threshold = 0.50
-    if execute_inference or 'results' not in st.session_state:
+    forced = st.session_state.pop('force_inference', False)
+    need_run = False
+
+    if forced or execute_inference:
+        need_run = True
+    elif 'results' not in st.session_state:
+        need_run = True
+    elif source_type == "folder" and target_folder and target_folder != st.session_state.get('active_source_path'):
+        if os.path.isdir(target_folder):
+            valid_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
+            if any(f.lower().endswith(valid_exts) for f in os.listdir(target_folder)):
+                need_run = True
+    elif source_type == "upload" and uploaded_files and st.session_state.get('active_source_path') != 'upload':
+        need_run = True
+
+    if need_run:
         if source_type == "folder" and target_folder:
-            if os.path.exists(target_folder):
-                with st.spinner("Procesando inferencia con UAVShipNet en tiempo real..."):
-                    results, avg_latency = evaluator.predict_folder(target_folder, threshold=fixed_threshold)
-                    st.session_state['results'] = results
-                    st.session_state['avg_latency'] = avg_latency
+            if os.path.isdir(target_folder):
+                valid_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
+                imgs_to_proc = [f for f in os.listdir(target_folder) if f.lower().endswith(valid_exts)]
+                if imgs_to_proc:
+                    with st.spinner(f"Procesando {len(imgs_to_proc)} imágenes de '{os.path.basename(target_folder)}' con UAVShipNet..."):
+                        results, avg_latency = evaluator.predict_folder(target_folder, threshold=fixed_threshold)
+                        st.session_state['results'] = results
+                        st.session_state['avg_latency'] = avg_latency
+                        st.session_state['active_source_path'] = target_folder
+                        st.session_state['active_load_mode'] = load_mode
+                        st.session_state.pop('editor_tabla_gt', None)
+                else:
+                    st.warning(f"La carpeta '{target_folder}' no contiene imágenes con extensiones soportadas.")
             else:
                 st.error(f"La ruta '{target_folder}' no existe.")
         elif source_type == "upload" and uploaded_files:
-            with st.spinner("Procesando archivos subidos con UAVShipNet..."):
+            with st.spinner(f"Procesando {len(uploaded_files)} archivos subidos con UAVShipNet..."):
                 results, avg_latency = evaluator.predict_uploaded_files(uploaded_files, threshold=fixed_threshold)
                 st.session_state['results'] = results
                 st.session_state['avg_latency'] = avg_latency
+                st.session_state['active_source_path'] = 'upload'
+                st.session_state['active_load_mode'] = load_mode
+                st.session_state.pop('editor_tabla_gt', None)
 
     # Presentación de Resultados
     if 'results' in st.session_state and st.session_state['results']:
