@@ -91,8 +91,8 @@ run_app.bat
 ### Opción Manual desde Terminal:
 1. Clonar el repositorio:
    ```bash
-   git clone https://github.com/samuelchaparro1233/uav-maritime-perception.git
-   cd uav-maritime-perception
+   git clone https://github.com/samuelchaparro1233/Parcial2_IA_UAV_ShipNet.git
+   cd Parcial2_IA_UAV_ShipNet
    ```
 2. Instalar dependencias:
    ```bash
@@ -135,6 +135,67 @@ run_app.bat
 └── data/
     └── dataset_metadata.csv    # Catálogo de metadatos de las 5,112 imágenes de entrenamiento
 ```
+
+---
+
+## 7. Referencias Bibliográficas, Datasets y Atribución (Open Science)
+
+Este proyecto se adhiere a los principios de **ética académica, reproducibilidad científica y licenciamiento de datos abiertos**:
+
+### A. Datasets Empleados
+
+1. **Ships in Satellite Imagery (Dataset Core)**
+   * **Autor / Creador:** Robert Hammell (`rhammell`) & Planet Labs Inc.
+   * **Plataforma:** Kaggle Datasets (2018).
+   * **Enlace Oficial:** [https://www.kaggle.com/datasets/rhammell/ships-in-satellite-imagery](https://www.kaggle.com/datasets/rhammell/ships-in-satellite-imagery)
+   * **Licencia:** Open Database License (ODbL) / CC BY-SA 4.0.
+   * **Descripción:** 4,000 imágenes RGB de 80×80 px extraídas de la constelación PlanetScope (Dove cubesats a 3 m GSD) sobre la Bahía de San Francisco y el Puerto de Oakland.
+   * **Cita Académica:**
+     ```bibtex
+     @misc{hammell2018ships,
+       title={Ships in Satellite Imagery: 80x80 RGB images of ships and non-ships},
+       author={Hammell, Robert and Planet Labs},
+       year={2018},
+       publisher={Kaggle},
+       url={https://www.kaggle.com/datasets/rhammell/ships-in-satellite-imagery}
+     }
+     ```
+
+2. **FGSC-23: Fine-Grained Ship Classification in Optical Remote Sensing Images**
+   * **Autores:** Xiaoqiang Zhang, Xiangxuan Ge, et al. (School of Computer Science and Engineering, Beihang University).
+   * **Sensor:** Satélite Gaofen-2 (GF-2) y Google Earth (0.8 m GSD).
+   * **Repositorio Hugging Face:** [https://huggingface.co/datasets/jbourcier/fgsc23](https://huggingface.co/datasets/jbourcier/fgsc23)
+   * **Repositorio GitHub:** [https://github.com/dgy82/Satellite-Imagery-Datasets-Containing-Ships](https://github.com/dgy82/Satellite-Imagery-Datasets-Containing-Ships)
+   * **Uso en el Proyecto:** Se filtraron exclusivamente los buques comerciales de la marina mercante (portacontenedores, graneleros, petroleros, metaneros y barcazas fluviales) y fondos portuarios para contextualizar el Puerto de Rotterdam.
+   * **Cita Académica:**
+     ```bibtex
+     @article{zhang2020fgsc23,
+       title={A New Benchmark and an Attribute-Guided Multilevel Feature Representation Network for Fine-Grained Ship Classification in Optical Remote Sensing Images},
+       author={Zhang, Xiaoqiang and Ge, Xiangxuan and others},
+       journal={IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing},
+       volume={13},
+       pages={2970--2985},
+       year={2020},
+       publisher={IEEE},
+       doi={10.1109/JSTARS.2020.2996950}
+     }
+     ```
+
+3. **Ship Detection using Faster R-CNN: Part 1**
+   * **Autor:** Aditya Jain (`adityajn105`).
+   * **Plataforma:** Kaggle Code (2020).
+   * **Enlace:** [https://www.kaggle.com/code/adityajn105/ship-detection-using-faster-r-cnn-part-1](https://www.kaggle.com/code/adityajn105/ship-detection-using-faster-r-cnn-part-1)
+   * **Aporte Metodológico:** Estudio de propuestas de región (ROIs) y tratamiento del desbalance de clases (1:3) en visión por computador marítima.
+
+### B. Literatura Operacional y Mecatrónica
+
+* **Dahana, U., & Gurning, R. O. S. (2020).** *Maritime Aerial Surveillance: Integration Manual Identification System to Automatic Identification System*. IOP Conference Series: Earth and Environmental Science, 557(1), 012014. DOI: [10.1088/1755-1315/557/1/012014](https://doi.org/10.1088/1755-1315/557/1/012014).
+* **Port of Rotterdam Authority (2022).** *Drone-based Smart Port Surveillance: Autonomous Inspection Operations in Deep-sea Terminals*. The Maritime Executive.
+* **Gallego, A.-J., Pertusa, A., & Gil, P. (2018).** *Automatic Ship Classification from Optical Aerial Images with Convolutional Neural Networks*. Remote Sensing, 10(4), 511. DOI: [10.3390/rs10040511](https://doi.org/10.3390/rs10040511).
+
+### C. Identidad Institucional
+* **Universidad Militar Nueva Granada (UMNG):** Portal institucional oficial: [https://www.umng.edu.co](https://www.umng.edu.co).
+* **Escudo Oficial:** Wikimedia Commons, [Archivo: Escudo oficial Universidad Militar Nueva Granada](https://commons.wikimedia.org/wiki/File:Escudo_oficial_Universidad_Militar_Nueva_Granada.svg), bajo licencia de identidad corporativa académica.
 
 ---
 *Desarrollado para la Facultad de Ingeniería de la Universidad Militar Nueva Granada (UMNG).*

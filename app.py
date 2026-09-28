@@ -813,6 +813,33 @@ with tabs[1]:
         * **Pérdida Simétrica Equilibrada:** Asegura que el umbral de decisión natural sea exactamente $\theta = 0.50$.
         """)
 
+    st.divider()
+    with st.expander("📚 Fuentes de Datos, Referencias Bibliográficas y Atribución (Open Science)", expanded=False):
+        st.markdown("""
+        #### 1. Datasets Empleados con Atribución Oficial:
+        * **Ships in Satellite Imagery (Dataset Core - 3m GSD):**
+          - **Autor / Creador:** Robert Hammell (`rhammell`) & Planet Labs Inc.
+          - **Enlace Kaggle:** [https://www.kaggle.com/datasets/rhammell/ships-in-satellite-imagery](https://www.kaggle.com/datasets/rhammell/ships-in-satellite-imagery)
+          - **Licencia:** Open Database License (ODbL) / CC BY-SA 4.0.
+          - **Cita:** Hammell, R. (2018). *Ships in Satellite Imagery: 80x80 RGB images of ships and non-ships*, Kaggle.
+        
+        * **FGSC-23 (Flota Mercante Gaofen-2 & Google Earth - 0.8m GSD):**
+          - **Autores:** Xiaoqiang Zhang, Xiangxuan Ge et al. (Beihang University).
+          - **Paper Oficial (IEEE):** *A New Benchmark and an Attribute-Guided Multilevel Feature Representation Network for Fine-Grained Ship Classification in Optical Remote Sensing Images*, IEEE JSTARS, vol. 13, 2020. DOI: [10.1109/JSTARS.2020.2996950](https://doi.org/10.1109/JSTARS.2020.2996950).
+          - **Repositorio Hugging Face:** [https://huggingface.co/datasets/jbourcier/fgsc23](https://huggingface.co/datasets/jbourcier/fgsc23)
+          - **Repositorio GitHub:** [Satellite-Imagery-Datasets-Containing-Ships](https://github.com/dgy82/Satellite-Imagery-Datasets-Containing-Ships)
+        
+        * **Ship Detection using Faster R-CNN (Part 1):**
+          - **Autor:** Aditya Jain (`adityajn105`).
+          - **Enlace Kaggle:** [https://www.kaggle.com/code/adityajn105/ship-detection-using-faster-r-cnn-part-1](https://www.kaggle.com/code/adityajn105/ship-detection-using-faster-r-cnn-part-1)
+          - **Aporte:** Análisis de propuestas de región (ROIs) y manejo del desbalance de clases (1:3).
+
+        #### 2. Literatura Operacional y Mecatrónica:
+        * **Dahana, U., & Gurning, R. O. S. (2020).** *Maritime Aerial Surveillance: Integration Manual Identification System to Automatic Identification System*. IOP Conf. Ser.: Earth Environ. Sci., 557(1), 012014. DOI: [10.1088/1755-1315/557/1/012014](https://doi.org/10.1088/1755-1315/557/1/012014).
+        * **Port of Rotterdam Authority (2022).** *Drone-based Smart Port Surveillance: Autonomous Inspection Operations in Deep-sea Terminals*. The Maritime Executive.
+        * **Gallego, A.-J., Pertusa, A., & Gil, P. (2018).** *Automatic Ship Classification from Optical Aerial Images with Convolutional Neural Networks*. Remote Sensing, 10(4), 511. DOI: [10.3390/rs10040511](https://doi.org/10.3390/rs10040511).
+        """)
+
 # =============================================================================
 # TAB 3: VALIDACION Y GENERALIZACION (E3)
 # =============================================================================
