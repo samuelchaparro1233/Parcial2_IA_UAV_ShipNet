@@ -48,10 +48,10 @@ ax_ribbon.text(0.5, 0.35, telemetry_str, color='#cbd5e1', fontsize=9, fontweight
 
 # 3. Tarjetas de Telemetría KPIs (Fila 2, Cuadrícula de 4 bloques MFD)
 kpis = [
-    ("LOTE EVALUADO", "200", "Imágenes Ciega (Zero Leakage)", "#38bdf8"),
-    ("BARCOS DETECTADOS", "100", "Clase 1 (Recall: 100.0%)", "#10b981"),
-    ("LATENCIA EN VIVO", "1.12 ms", "> 250 FPS (Jetson Orin Nano)", "#f59e0b"),
-    ("ACCURACY EN VIVO", "99.50%", "CUMPLE ABET N5 (≥98.0%)", "#10b981")
+    ("ACCURACY GLOBAL", "99.50%", "CUMPLE ABET N5 (≥98.0%)", "#10b981"),
+    ("PRECISIÓN (PRECISION)", "99.00%", "TP/(TP+FP) - Falsa Alarma: 1", "#00f0ff"),
+    ("SENSIBILIDAD (RECALL)", "100.00%", "TP/(TP+FN) - Barcos Omitidos: 0", "#f8b133"),
+    ("F1-SCORE ARMÓNICO", "99.50%", "Media Armónica P y R", "#a855f7")
 ]
 
 for idx, (label, val, sub, col) in enumerate(kpis):

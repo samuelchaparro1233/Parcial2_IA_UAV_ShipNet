@@ -931,70 +931,113 @@ with tabs[0]:
         # DASHBOARD DE MÉTRICAS MULTI-FUNCTION DISPLAY (E4)
         # =====================================================================
         st.divider()
-        st.subheader("📊 Métricas de Percepción en Tiempo Real (Requerimiento E4)")
+        st.divider()
+        st.subheader("📊 Métricas de Percepción y Telemetría en Tiempo Real (Requerimiento E4)")
 
-        kpi_col1, kpi_col2, kpi_col3, kpi_col4, kpi_col5, kpi_col6 = st.columns(6)
+        # Nivel 1: Telemetría Operacional del Lote
+        st.markdown("##### 🛰️ Telemetría Operacional del Lote")
+        kpi_op1, kpi_op2, kpi_op3, kpi_op4 = st.columns(4)
 
-        with kpi_col1:
+        with kpi_op1:
             st.markdown(f"""
             <div class="kpi-hud-card" style="--kpi-glow: #38bdf8;">
                 <div class="kpi-label">Lote Evaluado</div>
                 <div class="kpi-val" style="color: #38bdf8;">{total_images}</div>
-                <div class="kpi-status-badge badge-info">Imágenes</div>
+                <div class="kpi-status-badge badge-info">Imágenes Ciega</div>
             </div>
             """, unsafe_allow_html=True)
 
         ships_count = sum(1 for r in results if r['pred_label'] == 1)
-        with kpi_col2:
+        with kpi_op2:
             st.markdown(f"""
             <div class="kpi-hud-card" style="--kpi-glow: #10b981;">
                 <div class="kpi-label">Barcos Detectados</div>
                 <div class="kpi-val" style="color: #10b981;">{ships_count}</div>
-                <div class="kpi-status-badge badge-success">Clase 1</div>
+                <div class="kpi-status-badge badge-success">Clase 1 (Positivos)</div>
             </div>
             """, unsafe_allow_html=True)
 
-        with kpi_col3:
+        with kpi_op3:
             noships_count = total_images - ships_count
             st.markdown(f"""
             <div class="kpi-hud-card" style="--kpi-glow: #60a5fa;">
-                <div class="kpi-label">No-Barcos</div>
+                <div class="kpi-label">No-Barcos (Fondos/Muelles)</div>
                 <div class="kpi-val" style="color: #60a5fa;">{noships_count}</div>
-                <div class="kpi-status-badge badge-info">Clase 0</div>
+                <div class="kpi-status-badge badge-info">Clase 0 (Negativos)</div>
             </div>
             """, unsafe_allow_html=True)
 
-        with kpi_col4:
+        with kpi_op4:
             st.markdown(f"""
             <div class="kpi-hud-card" style="--kpi-glow: #f59e0b;">
-                <div class="kpi-label">Latencia GPU/CPU</div>
+                <div class="kpi-label">Latencia Inferencia</div>
                 <div class="kpi-val" style="color: #f59e0b;">{avg_latency:.2f}<span style="font-size: 0.95rem;">ms</span></div>
-                <div class="kpi-status-badge badge-info">&gt; 250 FPS</div>
+                <div class="kpi-status-badge badge-info">&gt; 250 FPS (Jetson)</div>
             </div>
             """, unsafe_allow_html=True)
+
+        # Nivel 2: Métricas Cuantitativas de Inteligencia Artificial (ABET SO6)
+        st.markdown("##### 🎯 Rendimiento Cuantitativo de Clasificación (Evaluación ABET SO6)")
 
         if has_gt and len(y_true) == total_images:
             metrics = evaluator.calculate_metrics(y_true, y_pred)
             acc = metrics['accuracy'] * 100.0
+            prec = metrics['precision'] * 100.0
+            rec = metrics['recall'] * 100.0
+            f1 = metrics['f1'] * 100.0
+
             acc_color = "#10b981" if acc >= 98.0 else ("#f59e0b" if acc >= 90.0 else "#ef4444")
-            
-            with kpi_col5:
-                badge_text = "CUMPLE N5 (≥98%)" if acc >= 98.0 else "<98% (PENALIZABLE)"
+            prec_color = "#00f0ff" if prec >= 95.0 else "#f59e0b"
+            rec_color = "#f8b133" if rec >= 95.0 else "#f59e0b"
+            f1_color = "#a855f7" if f1 >= 95.0 else "#f59e0b"
+
+            kpi_ai1, kpi_ai2, kpi_ai3, kpi_ai4 = st.columns(4)
+
+            with kpi_ai1:
+                badge_text = "CUMPLE N5 (≥98.0%)" if acc >= 98.0 else "<98.0% (PENALIZABLE)"
                 badge_class = "badge-success" if acc >= 98.0 else "badge-target-warn"
                 st.markdown(f"""
                 <div class="kpi-hud-card" style="--kpi-glow: {acc_color};">
-                    <div class="kpi-label">Accuracy en Vivo</div>
+                    <div class="kpi-label">Accuracy Global</div>
                     <div class="kpi-val" style="color: {acc_color};">{acc:.2f}%</div>
                     <div class="kpi-status-badge {badge_class}">{badge_text}</div>
+                    <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 4px; font-family: monospace;">Acierto Total ({int(round(acc*total_images/100))}/{total_images})</div>
                 </div>
                 """, unsafe_allow_html=True)
 
-            with kpi_col6:
+            with kpi_ai2:
+                prec_badge = "PRECISIÓN ALTA (≥95%)" if prec >= 95.0 else "<95%"
+                prec_class = "badge-success" if prec >= 95.0 else "badge-target-warn"
                 st.markdown(f"""
-                <div class="kpi-hud-card" style="--kpi-glow: #a855f7;">
-                    <div class="kpi-label">F1-Score</div>
-                    <div class="kpi-val" style="color: #a855f7;">{metrics['f1']*100.0:.2f}%</div>
-                    <div class="kpi-status-badge badge-success">Rec: {metrics['recall']*100:.1f}%</div>
+                <div class="kpi-hud-card" style="--kpi-glow: {prec_color};">
+                    <div class="kpi-label">Precisión (Precision)</div>
+                    <div class="kpi-val" style="color: {prec_color};">{prec:.2f}%</div>
+                    <div class="kpi-status-badge {prec_class}">{prec_badge}</div>
+                    <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 4px; font-family: monospace;">TP / (TP + FP) = {metrics['tp']}/{metrics['tp']+metrics['fp']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with kpi_ai3:
+                rec_badge = "RECALL ÓPTIMO (≥95%)" if rec >= 95.0 else "<95%"
+                rec_class = "badge-success" if rec >= 95.0 else "badge-target-warn"
+                st.markdown(f"""
+                <div class="kpi-hud-card" style="--kpi-glow: {rec_color};">
+                    <div class="kpi-label">Sensibilidad (Recall)</div>
+                    <div class="kpi-val" style="color: {rec_color};">{rec:.2f}%</div>
+                    <div class="kpi-status-badge {rec_class}">{rec_badge}</div>
+                    <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 4px; font-family: monospace;">TP / (TP + FN) = {metrics['tp']}/{metrics['tp']+metrics['fn']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with kpi_ai4:
+                f1_badge = "BALANCE N5 (≥95%)" if f1 >= 95.0 else "<95%"
+                f1_class = "badge-success" if f1 >= 95.0 else "badge-target-warn"
+                st.markdown(f"""
+                <div class="kpi-hud-card" style="--kpi-glow: {f1_color};">
+                    <div class="kpi-label">F1-Score Armónico</div>
+                    <div class="kpi-val" style="color: {f1_color};">{f1:.2f}%</div>
+                    <div class="kpi-status-badge {f1_class}">{f1_badge}</div>
+                    <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 4px; font-family: monospace;">Media Armónica P & R</div>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -1028,8 +1071,29 @@ with tabs[0]:
                 ax_hist.set_ylabel('Frecuencia', color='#cbd5e1')
                 ax_hist.legend(facecolor='#0a152e', edgecolor='none', labelcolor='white')
                 st.pyplot(fig_hist)
+
+            # Resumen analítico de contingencia
+            st.markdown(f"""
+            <div style="background: rgba(10, 18, 38, 0.7); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 10px 14px; margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #cbd5e1;">
+                <b>DESGLOSE DE CONTINGENCIA:</b> 
+                &nbsp;● Verdaderos Positivos (TP): <span style="color: #34d399; font-weight: bold;">{metrics['tp']}</span>
+                &nbsp;|&nbsp;● Verdaderos Negativos (TN): <span style="color: #38bdf8; font-weight: bold;">{metrics['tn']}</span>
+                &nbsp;|&nbsp;● Falsos Positivos (FP): <span style="color: #f59e0b; font-weight: bold;">{metrics['fp']}</span>
+                &nbsp;|&nbsp;● Falsos Negativos (FN): <span style="color: #f43f5e; font-weight: bold;">{metrics['fn']}</span> (Cero buques omitidos)
+            </div>
+            """, unsafe_allow_html=True)
         else:
-            st.warning("⚠️ Hay imágenes con Ground Truth pendiente. Usa los botones de arriba o la tabla para completar el etiquetado y ver la Matriz de Confusión.")
+            kpi_p1, kpi_p2, kpi_p3, kpi_p4 = st.columns(4)
+            for col, lbl in zip([kpi_p1, kpi_p2, kpi_p3, kpi_p4], ["Accuracy Global", "Precisión (Precision)", "Sensibilidad (Recall)", "F1-Score Armónico"]):
+                with col:
+                    st.markdown(f"""
+                    <div class="kpi-hud-card" style="--kpi-glow: #64748b;">
+                        <div class="kpi-label">{lbl}</div>
+                        <div class="kpi-val" style="color: #64748b;">-- %</div>
+                        <div class="kpi-status-badge badge-target-warn">Ground Truth Pendiente</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            st.warning("⚠️ Hay imágenes con Ground Truth pendiente. Usa los botones de arriba ('Adoptar Predicciones') o la tabla interactiva para completar el etiquetado y ver la Matriz de Confusión.")
 
         # Galería Visual de Inferencia con Retículas Tácticas
         st.divider()
