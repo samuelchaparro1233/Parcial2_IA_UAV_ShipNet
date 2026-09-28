@@ -17,7 +17,7 @@
 <p align="center">
   <img src="assets/gui_interface_preview.png" width="950" alt="Interfaz Gráfica Streamlit - UAV ShipNet Telemetría y Detección">
   <br>
-  <em>Panel de Control y Telemetría en Tiempo Real con branding institucional UMNG, KPIs operacionales, matriz de confusión y galería de inferencia ciega.</em>
+  <em>Panel de Control y Telemetría Aeroespacial UMNG: Consola Radar HUD 360°, cinta de telemetría de vuelo, KPIs Multi-Function Display, matriz de confusión, analizador óptico multiespectral (RGB, Infrarrojo CIR, Sobel, Heatmap) y galería táctica con visor de puntería.</em>
 </p>
 
 ---

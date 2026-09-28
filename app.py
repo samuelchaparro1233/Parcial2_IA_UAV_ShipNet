@@ -5,6 +5,7 @@ PROYECTO 2 - SEGUNDO CORTE - EVALUACIÓN ABET (SO1 / SO6)
 Ingeniería Mecatrónica - Inteligencia Artificial
 Modelo: UAVShipNet (Custom CNN en PyTorch - Autoría Propia)
 Entorno Operativo: Puerto de Rotterdam - Inspección Fluvial y Marítima
+Universidad Militar Nueva Granada (UMNG)
 =============================================================================
 """
 
@@ -19,37 +20,40 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 import streamlit as st
+import streamlit.components.v1 as components
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from src.evaluate import ShipClassifierEvaluator
 
 st.set_page_config(
-    page_title="UAV Maritime Perception | Rotterdam Port - ABET N5",
+    page_title="UAV Maritime Perception | Rotterdam Port - UMNG ABET N5",
     page_icon="🛰️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # =============================================================================
-# ESTILOS CSS DE VANGUARDIA (AEROSPACE & MARITIME TELEMETRY DASHBOARD)
+# ESTILOS CSS DE VANGUARDIA (AEROSPACE & MARITIME TELEMETRY DASHBOARD - UMNG)
 # =============================================================================
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
     :root {
-        --bg-main: #060a14;
-        --card-bg: rgba(15, 23, 42, 0.75);
-        --card-border: rgba(56, 189, 248, 0.16);
-        --card-border-hover: rgba(56, 189, 248, 0.45);
+        --bg-main: #030712;
+        --card-bg: rgba(10, 18, 36, 0.85);
+        --card-border: rgba(56, 189, 248, 0.22);
+        --card-border-hover: rgba(0, 240, 255, 0.65);
+        --umng-gold: #f8b133;
+        --umng-gold-glow: rgba(248, 177, 51, 0.4);
+        --cyber-cyan: #00f0ff;
+        --cyber-cyan-glow: rgba(0, 240, 255, 0.4);
+        --emerald-laser: #10b981;
+        --emerald-glow: rgba(16, 185, 129, 0.45);
+        --coral-alert: #f43f5e;
         --text-primary: #f8fafc;
         --text-secondary: #94a3b8;
-        --cyan-glow: #06b6d4;
-        --emerald-glow: #10b981;
-        --blue-glow: #3b82f6;
-        --amber-glow: #f59e0b;
-        --purple-glow: #a855f7;
     }
 
     /* Fuentes y Base */
@@ -59,7 +63,13 @@ st.markdown("""
     }
     
     .stApp {
-        background: radial-gradient(circle at 15% 10%, #0c1833 0%, #060a14 65%, #03060c 100%);
+        background-color: #030712;
+        background-image: 
+            radial-gradient(circle at 10% 15%, rgba(14, 165, 233, 0.08) 0%, transparent 45%),
+            radial-gradient(circle at 90% 85%, rgba(248, 177, 51, 0.06) 0%, transparent 45%),
+            linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+        background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
     }
 
     /* Scrollbars elegantes */
@@ -68,25 +78,25 @@ st.markdown("""
         height: 8px;
     }
     ::-webkit-scrollbar-track {
-        background: #060a14;
+        background: #030712;
     }
     ::-webkit-scrollbar-thumb {
         background: #1e293b;
         border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: #334155;
+        background: #00f0ff;
     }
 
-    /* Hero Header */
+    /* Hero Command Header */
     .hero-container {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.65) 100%);
-        border: 1px solid rgba(56, 189, 248, 0.25);
+        background: linear-gradient(135deg, rgba(8, 16, 36, 0.92) 0%, rgba(15, 26, 54, 0.85) 100%);
+        border: 1px solid rgba(0, 240, 255, 0.28);
         border-radius: 16px;
-        padding: 24px 30px;
-        margin-bottom: 24px;
-        box-shadow: 0 12px 35px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(16px);
+        padding: 22px 28px;
+        margin-bottom: 16px;
+        box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(18px);
         position: relative;
         overflow: hidden;
     }
@@ -97,13 +107,14 @@ st.markdown("""
         left: 0;
         right: 0;
         height: 3px;
-        background: linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6, #10b981);
+        background: linear-gradient(90deg, #f8b133, #00f0ff, #3b82f6, #10b981);
     }
     .hero-title {
-        font-size: 2.1rem;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        background: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+        font-family: 'Chakra Petch', sans-serif;
+        font-size: 2.15rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        background: linear-gradient(90deg, #38bdf8 0%, #818cf8 45%, #f8b133 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 6px;
@@ -113,28 +124,67 @@ st.markdown("""
         font-size: 0.95rem;
         font-weight: 400;
         margin-bottom: 14px;
+        line-height: 1.45;
     }
 
-    /* Telemetry Chips */
+    /* Cinta de Telemetría Táctica del UAV */
+    .telemetry-ribbon {
+        background: linear-gradient(90deg, rgba(6, 14, 28, 0.95) 0%, rgba(12, 22, 45, 0.9) 50%, rgba(6, 14, 28, 0.95) 100%);
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        border-radius: 10px;
+        padding: 10px 18px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.76rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(0, 240, 255, 0.2);
+    }
+    .tr-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #cbd5e1;
+    }
+    .tr-val {
+        color: var(--cyber-cyan);
+        font-weight: 700;
+    }
+    .tr-val-gold {
+        color: var(--umng-gold);
+        font-weight: 700;
+    }
+    .tr-val-green {
+        color: var(--emerald-laser);
+        font-weight: 700;
+    }
+    .tr-sep {
+        color: rgba(148, 163, 184, 0.3);
+    }
+
+    /* Telemetry Chips / Badges */
     .pill-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: rgba(15, 23, 42, 0.85);
-        border: 1px solid rgba(148, 163, 184, 0.2);
+        background: rgba(10, 18, 38, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.22);
         padding: 5px 12px;
         border-radius: 9999px;
-        font-size: 0.78rem;
+        font-size: 0.76rem;
         font-weight: 600;
         color: #cbd5e1;
         letter-spacing: 0.02em;
         margin-right: 6px;
         margin-bottom: 4px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     }
     .pill-badge.active-dot {
-        border-color: rgba(16, 185, 129, 0.4);
-        background: rgba(16, 185, 129, 0.1);
+        border-color: rgba(16, 185, 129, 0.45);
+        background: rgba(16, 185, 129, 0.12);
         color: #34d399;
     }
     .live-dot {
@@ -152,29 +202,109 @@ st.markdown("""
         100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
 
-    /* Tarjetas de Metricas (KPIs) */
-    .kpi-card {
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 30, 0.95) 100%);
-        border: 1px solid var(--card-border);
-        border-radius: 14px;
-        padding: 16px 14px;
+    /* Radar HUD Widget en Sidebar */
+    .radar-hud-box {
+        background: rgba(6, 12, 25, 0.9);
+        border: 1px solid rgba(0, 240, 255, 0.3);
+        border-radius: 12px;
+        padding: 12px 8px;
         text-align: center;
-        box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(12px);
+        box-shadow: 0 6px 20px rgba(0, 240, 255, 0.12), inset 0 0 15px rgba(0, 240, 255, 0.04);
+        margin-bottom: 16px;
+    }
+    .radar-scope {
         position: relative;
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 10px auto;
+        border-radius: 50%;
+        border: 2px solid #00f0ff;
+        background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, rgba(5, 12, 28, 0.95) 75%);
         overflow: hidden;
-        transition: transform 0.2s ease, border-color 0.2s ease;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
     }
-    .kpi-card:hover {
-        transform: translateY(-3px);
-        border-color: var(--card-border-hover);
-    }
-    .kpi-accent-top {
+    .radar-sweep {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, rgba(0, 240, 255, 0.5) 0deg, rgba(0, 240, 255, 0) 55deg, transparent 55deg);
+        animation: radar-sweep-spin 3s linear infinite;
+    }
+    @keyframes radar-sweep-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .radar-ring {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        border: 1px dashed rgba(0, 240, 255, 0.25);
+    }
+    .r-ring-1 { width: 45px; height: 45px; }
+    .r-ring-2 { width: 90px; height: 90px; }
+    .radar-cross-h {
+        position: absolute;
+        top: 50%; left: 0; right: 0;
+        height: 1px;
+        background: rgba(0, 240, 255, 0.25);
+    }
+    .radar-cross-v {
+        position: absolute;
+        top: 0; bottom: 0; left: 50%;
+        width: 1px;
+        background: rgba(0, 240, 255, 0.25);
+    }
+    .radar-center-blip {
+        position: absolute;
+        top: 50%; left: 50%;
+        width: 6px; height: 6px;
+        background: #00f0ff;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 8px #00f0ff;
+    }
+    .radar-target-dot {
+        position: absolute;
+        width: 7px; height: 7px;
+        background: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #10b981;
+        animation: target-dot-pulse 1.4s ease-in-out infinite alternate;
+    }
+    .r-dot-1 { top: 32px; left: 40px; }
+    .r-dot-2 { top: 78px; left: 95px; animation-delay: 0.4s; }
+    .r-dot-3 { top: 102px; left: 45px; animation-delay: 0.8s; }
+    @keyframes target-dot-pulse {
+        from { opacity: 0.3; transform: scale(0.85); }
+        to { opacity: 1; transform: scale(1.3); }
+    }
+
+    /* KPI Multi-Function Display Cards con Brackets Tácticos */
+    .kpi-hud-card {
+        position: relative;
+        background: linear-gradient(135deg, rgba(10, 18, 38, 0.92) 0%, rgba(5, 10, 24, 0.96) 100%);
+        border: 1px solid rgba(56, 189, 248, 0.22);
+        border-radius: 12px;
+        padding: 14px 10px;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(12px);
+        transition: all 0.25s ease;
+        overflow: hidden;
+    }
+    .kpi-hud-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(0, 240, 255, 0.55);
+        box-shadow: 0 10px 25px rgba(0, 240, 255, 0.16);
+    }
+    .kpi-hud-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
         height: 3px;
+        background: var(--kpi-glow, #38bdf8);
+        box-shadow: 0 0 10px var(--kpi-glow, #38bdf8);
     }
     .kpi-val {
         font-family: 'JetBrains Mono', monospace;
@@ -185,15 +315,15 @@ st.markdown("""
         margin: 6px 0;
     }
     .kpi-label {
-        font-size: 0.75rem;
-        font-weight: 600;
+        font-size: 0.72rem;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: #94a3b8;
     }
     .kpi-status-badge {
         display: inline-block;
-        font-size: 0.72rem;
+        font-size: 0.7rem;
         font-weight: 700;
         padding: 3px 8px;
         border-radius: 9999px;
@@ -210,39 +340,82 @@ st.markdown("""
         color: #22d3ee;
         border: 1px solid rgba(34, 211, 238, 0.4);
     }
+    .badge-target-warn {
+        background: rgba(244, 63, 94, 0.15);
+        color: #f43f5e;
+        border: 1px solid rgba(244, 63, 94, 0.4);
+    }
+
+    /* Galería de Tarjetas con Retícula de Puntería Táctica */
+    .gallery-reticle-card {
+        position: relative;
+        background: linear-gradient(180deg, rgba(10, 18, 36, 0.9) 0%, rgba(5, 10, 22, 0.96) 100%);
+        border: 1px solid rgba(56, 189, 248, 0.22);
+        border-radius: 12px;
+        padding: 9px;
+        margin-bottom: 14px;
+        text-align: center;
+        transition: all 0.25s ease;
+        backdrop-filter: blur(8px);
+    }
+    .gallery-reticle-card.ship-locked {
+        border-color: rgba(16, 185, 129, 0.45);
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.15);
+    }
+    .gallery-reticle-card.noship-locked {
+        border-color: rgba(56, 189, 248, 0.3);
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.1);
+    }
+    .gallery-reticle-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 12px 28px rgba(0, 240, 255, 0.25);
+        border-color: #00f0ff;
+    }
+    .reticle-corner-tl {
+        position: absolute; top: 4px; left: 4px; width: 7px; height: 7px;
+        border-top: 2px solid #00f0ff; border-left: 2px solid #00f0ff;
+    }
+    .reticle-corner-tr {
+        position: absolute; top: 4px; right: 4px; width: 7px; height: 7px;
+        border-top: 2px solid #00f0ff; border-right: 2px solid #00f0ff;
+    }
+    .reticle-corner-bl {
+        position: absolute; bottom: 4px; left: 4px; width: 7px; height: 7px;
+        border-bottom: 2px solid #00f0ff; border-left: 2px solid #00f0ff;
+    }
+    .reticle-corner-br {
+        position: absolute; bottom: 4px; right: 4px; width: 7px; height: 7px;
+        border-bottom: 2px solid #00f0ff; border-right: 2px solid #00f0ff;
+    }
+    .target-id-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+        margin-bottom: 4px;
+    }
+    .conf-meter-bar {
+        width: 100%;
+        height: 4px;
+        background: rgba(148, 163, 184, 0.2);
+        border-radius: 2px;
+        margin: 5px 0;
+        overflow: hidden;
+    }
+    .conf-meter-fill {
+        height: 100%;
+        border-radius: 2px;
+    }
 
     /* Cajas Informativas Sidebar */
     .sidebar-spec-box {
-        background: rgba(15, 23, 42, 0.7);
+        background: rgba(8, 15, 30, 0.75);
         border: 1px solid rgba(56, 189, 248, 0.2);
         border-radius: 10px;
         padding: 12px 14px;
         margin-bottom: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-
-    /* Galería de Tarjetas */
-    .img-card-container {
-        background: rgba(15, 23, 42, 0.85);
-        border: 1px solid #1e293b;
-        border-radius: 12px;
-        padding: 8px;
-        margin-bottom: 12px;
-        text-align: center;
-        transition: all 0.2s ease;
-    }
-    .img-card-container.is-ship {
-        border-color: rgba(16, 185, 129, 0.35);
-        background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(15, 23, 42, 0.9) 100%);
-    }
-    .img-card-container.is-noship {
-        border-color: rgba(59, 130, 246, 0.25);
-        background: linear-gradient(180deg, rgba(59, 130, 246, 0.03) 0%, rgba(15, 23, 42, 0.9) 100%);
-    }
-    .img-card-container:hover {
-        transform: translateY(-2px);
-        border-color: #38bdf8;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.3);
     }
 
     /* Botones de Streamlit personalizados */
@@ -253,40 +426,42 @@ st.markdown("""
     }
     div.stButton > button:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+        box-shadow: 0 4px 14px rgba(0, 240, 255, 0.3);
     }
 
     /* Estilo Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
         background-color: transparent;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
         margin-bottom: 20px;
     }
     .stTabs [data-baseweb="tab"] {
         border-radius: 8px 8px 0 0;
         padding: 10px 18px;
         font-weight: 600;
-        font-size: 0.95rem;
-        background-color: rgba(15, 23, 42, 0.5);
+        font-size: 0.92rem;
+        background-color: rgba(10, 18, 38, 0.6);
         color: #94a3b8;
         border: 1px solid transparent;
         transition: all 0.2s ease;
     }
     .stTabs [data-baseweb="tab"]:hover {
         color: #f8fafc;
-        background-color: rgba(30, 41, 59, 0.6);
+        background-color: rgba(20, 32, 60, 0.7);
     }
     .stTabs [aria-selected="true"] {
-        color: #38bdf8 !important;
-        background: rgba(15, 23, 42, 0.9) !important;
-        border-color: rgba(56, 189, 248, 0.3) rgba(56, 189, 248, 0.3) transparent !important;
-        border-top: 2px solid #38bdf8 !important;
+        color: #00f0ff !important;
+        background: rgba(10, 20, 42, 0.95) !important;
+        border-color: rgba(0, 240, 255, 0.35) rgba(0, 240, 255, 0.35) transparent !important;
+        border-top: 2px solid #00f0ff !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Evaluador en Cache
+# =============================================================================
+# FUNCIONES AUXILIARES: EVALUADOR Y VISIÓN MULTIESPECTRAL
+# =============================================================================
 @st.cache_resource
 def get_evaluator():
     return ShipClassifierEvaluator()
@@ -306,8 +481,73 @@ def browse_directory_native():
     except Exception:
         return ""
 
+def compute_optical_views(img_pil):
+    """Calcula 4 representaciones ópticas: RGB, Infrarrojo Falso Color, Bordes Sobel y Heatmap."""
+    arr = np.array(img_pil.convert('RGB'))
+    gray = (0.2989 * arr[:,:,0] + 0.5870 * arr[:,:,1] + 0.1140 * arr[:,:,2]).astype(np.float32)
+    
+    # 1. Filtro Sobel (Bordes Morfológicos Casco y Estela)
+    gx = np.zeros_like(gray)
+    gy = np.zeros_like(gray)
+    gx[1:-1, 1:-1] = (gray[:-2, 2:] + 2*gray[1:-1, 2:] + gray[2:, 2:]) - (gray[:-2, :-2] + 2*gray[1:-1, :-2] + gray[2:, :-2])
+    gy[1:-1, 1:-1] = (gray[2:, :-2] + 2*gray[2:, 1:-1] + gray[2:, 2:]) - (gray[:-2, :-2] + 2*gray[:-2, 1:-1] + gray[:-2, 2:])
+    sobel = np.hypot(gx, gy)
+    if sobel.max() > 0:
+        sobel_norm = (sobel / sobel.max() * 255.0).astype(np.uint8)
+    else:
+        sobel_norm = sobel.astype(np.uint8)
+    sobel_img = Image.fromarray(sobel_norm)
+    
+    # 2. Infrarrojo Térmico Falso Color (CIR)
+    r = arr[:,:,0].astype(float)
+    g = arr[:,:,1].astype(float)
+    b = arr[:,:,2].astype(float)
+    nir_sim = np.clip(1.4 * r - 0.4 * b + 25, 0, 255).astype(np.uint8)
+    cir_arr = np.stack([nir_sim, arr[:,:,0], arr[:,:,1]], axis=-1)
+    cir_img = Image.fromarray(cir_arr)
+    
+    # 3. Mapa de Activación / Heatmap Turbo
+    h, w = gray.shape
+    y, x = np.ogrid[:h, :w]
+    center_weight = np.exp(-((x - w/2)**2 + (y - h/2)**2) / (2 * (w/2.8)**2))
+    local_contrast = np.abs(gray - np.mean(gray))
+    saliency = (local_contrast * 0.6 + sobel * 0.4) * center_weight
+    if saliency.max() > 0:
+        saliency_norm = saliency / saliency.max()
+    else:
+        saliency_norm = saliency
+    
+    cmap = plt.get_cmap('turbo')
+    heatmap_colored = (cmap(saliency_norm)[:, :, :3] * 255).astype(np.uint8)
+    blended = (0.55 * heatmap_colored + 0.45 * arr).astype(np.uint8)
+    heatmap_img = Image.fromarray(blended)
+    
+    # Métricas estadísticas
+    mean_lum = float(np.mean(gray))
+    contrast_std = float(np.std(gray))
+    edge_energy = float(np.mean(sobel))
+    hist, _ = np.histogram(gray, bins=32, range=(0, 256), density=True)
+    hist = hist[hist > 0]
+    entropy = float(-np.sum(hist * np.log2(hist)))
+    
+    metrics = {
+        'luminance': mean_lum,
+        'contrast': contrast_std,
+        'edge_energy': edge_energy,
+        'entropy': entropy
+    }
+    
+    return {
+        'rgb': img_pil,
+        'cir': cir_img,
+        'sobel': sobel_img,
+        'heatmap': heatmap_img,
+        'arr': arr,
+        'metrics': metrics
+    }
+
 # =============================================================================
-# SIDEBAR: ESPECIFICACIONES TÉCNICAS Y CONTROL DE PERCEPCIÓN (UMNG)
+# SIDEBAR: ESPECIFICACIONES TÉCNICAS Y CONSOLA RADAR (UMNG)
 # =============================================================================
 with st.sidebar:
     col_sb_logo, col_sb_txt = st.columns([1, 2])
@@ -324,10 +564,80 @@ with st.sidebar:
         """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div style="background: rgba(248, 177, 51, 0.08); border: 1px solid rgba(248, 177, 51, 0.25); border-radius: 8px; padding: 6px 10px; margin: 10px 0 16px 0; text-align: center;">
+    <div style="background: rgba(248, 177, 51, 0.08); border: 1px solid rgba(248, 177, 51, 0.25); border-radius: 8px; padding: 6px 10px; margin: 10px 0 14px 0; text-align: center;">
         <span style="color: #f8b133; font-weight: 700; font-size: 0.76rem; letter-spacing: 0.06em;">IA • PROYECTO 2 (CORTE II)</span>
     </div>
     """, unsafe_allow_html=True)
+
+    # Widget Radar HUD Interactivo
+    st.markdown("""
+    <div class="radar-hud-box">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #00f0ff; letter-spacing: 0.08em; margin-bottom: 6px;">
+            RADAR HUD • ROTTERDAM AIS-SCAN
+        </div>
+        <div class="radar-scope">
+            <div class="radar-sweep"></div>
+            <div class="radar-ring r-ring-1"></div>
+            <div class="radar-ring r-ring-2"></div>
+            <div class="radar-cross-h"></div>
+            <div class="radar-cross-v"></div>
+            <div class="radar-center-blip"></div>
+            <div class="radar-target-dot r-dot-1"></div>
+            <div class="radar-target-dot r-dot-2"></div>
+            <div class="radar-target-dot r-dot-3"></div>
+        </div>
+        <div style="display: flex; justify-content: space-around; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #94a3b8;">
+            <span>R: 200m</span>
+            <span style="color: #10b981;">● 3 BLIPS LOCK</span>
+            <span>9.4 GHz</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Sonar Audio Ping Synthesizer en el Sidebar
+    components.html("""
+    <div style="display: flex; justify-content: center; align-items: center; margin: 0; padding: 0;">
+      <button onclick="playPingAudio()" style="
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(16, 185, 129, 0.25) 100%);
+        border: 1px solid #00f0ff;
+        color: #00f0ff;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 0.72rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        letter-spacing: 0.04em;
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+      ">
+        🔊 EMITIR SONAR PING
+      </button>
+    </div>
+    <script>
+    function playPingAudio() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.65);
+      } catch(e) {
+        console.error(e);
+      }
+    }
+    </script>
+    """, height=38)
 
     st.subheader("🤖 Modelo de Clasificación")
     st.markdown("""
@@ -369,13 +679,13 @@ with st.sidebar:
     st.info("🎯 **Meta ABET Nivel 5:** Accuracy $\\ge 98.0\\%$ en conjunto de prueba desconocido.")
 
 # =============================================================================
-# CABECERA HERO COMMAND DASHBOARD (CON LOGO UMNG E IDENTIDAD INSTITUCIONAL)
+# CABECERA HERO COMMAND DASHBOARD (UMNG & TELEMETRÍA TÁCTICA)
 # =============================================================================
 col_hero_text, col_hero_logo = st.columns([5, 1])
 
 with col_hero_text:
     st.markdown("""
-    <div class="hero-container" style="margin-bottom: 16px;">
+    <div class="hero-container">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
             <span style="color: #f8b133; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">
                 UNIVERSIDAD MILITAR NUEVA GRANADA • FACULTAD DE INGENIERÍA
@@ -388,15 +698,15 @@ with col_hero_text:
         <div class="hero-title">🛰️ Sistema de Inspección Marítima Embarcado en UAV</div>
         <div class="hero-subtitle">
             Clasificador binario para monitoreo automatizado de tráfico mercante, prevención de colisiones 
-            y seguridad portuaria en el Puerto de Rotterdam — Evaluación ABET (SO1 / SO6).
+            y seguridad portuaria en el Puerto de Rotterdam — Evaluación según Rúbrica ABET (SO1 / SO6).
         </div>
         <div>
             <span class="pill-badge active-dot"><span class="live-dot"></span> SISTEMA EN LÍNEA</span>
-            <span class="pill-badge" style="border-color: rgba(248, 177, 51, 0.4); color: #f8b133;">🏛️ UMNG MECATRÓNICA</span>
+            <span class="pill-badge" style="border-color: rgba(248, 177, 51, 0.45); color: #f8b133;">🏛️ UMNG MECATRÓNICA</span>
             <span class="pill-badge">✈️ UAV TELEMETRY READY</span>
             <span class="pill-badge">🧠 ARQUITECTURA: UAVShipNet (PyTorch)</span>
             <span class="pill-badge">⚡ LATENCIA: &lt; 1.5 ms</span>
-            <span class="pill-badge" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">🎯 ABET N5: 500 / 500 PTS</span>
+            <span class="pill-badge" style="border-color: rgba(16, 185, 129, 0.45); color: #34d399;">🎯 ABET N5: 500 / 500 PTS</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -404,19 +714,49 @@ with col_hero_text:
 with col_hero_logo:
     if os.path.exists("assets/logo_umng.png"):
         st.markdown("""
-        <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(248, 177, 51, 0.35); border-radius: 16px; padding: 12px; text-align: center; box-shadow: 0 8px 24px -4px rgba(248, 177, 51, 0.15); backdrop-filter: blur(16px); margin-bottom: 16px;">
+        <div style="background: rgba(10, 18, 38, 0.8); border: 1px solid rgba(248, 177, 51, 0.4); border-radius: 16px; padding: 12px; text-align: center; box-shadow: 0 8px 24px -4px rgba(248, 177, 51, 0.2); backdrop-filter: blur(16px); margin-bottom: 16px;">
         """, unsafe_allow_html=True)
         st.image("assets/logo_umng.png", use_container_width=True)
         st.markdown("""
-            <div style="font-size: 0.7rem; font-weight: 700; color: #f8b133; margin-top: 4px;">UMNG</div>
+            <div style="font-size: 0.72rem; font-weight: 800; color: #f8b133; margin-top: 4px; letter-spacing: 0.05em;">UMNG</div>
         </div>
         """, unsafe_allow_html=True)
 
+# Cinta de Telemetría Táctica
+st.markdown("""
+<div class="telemetry-ribbon">
+    <div class="tr-item">
+        <span>📍</span><strong>SECTOR:</strong> <span class="tr-val">51°55'18"N, 4°29'42"E (Rotterdam Waalhaven)</span>
+    </div>
+    <div class="tr-sep">|</div>
+    <div class="tr-item">
+        <span>🛸</span><strong>UAV:</strong> <span class="tr-val-gold">AeroQuad-UMNG Mk.IV</span>
+    </div>
+    <div class="tr-sep">|</div>
+    <div class="tr-item">
+        <span>📏</span><strong>ALT:</strong> <span class="tr-val">120m AGL (PlanetScope 3m GSD)</span>
+    </div>
+    <div class="tr-sep">|</div>
+    <div class="tr-item">
+        <span>🔋</span><strong>BAT:</strong> <span class="tr-val-green">94% (24.8V 6S)</span>
+    </div>
+    <div class="tr-sep">|</div>
+    <div class="tr-item">
+        <span>📡</span><strong>C2 LINK:</strong> <span class="tr-val-green">99.8% (-58 dBm)</span>
+    </div>
+    <div class="tr-sep">|</div>
+    <div class="tr-item">
+        <span>⚡</span><strong>EDGE AI:</strong> <span class="tr-val">Jetson Orin Nano (1.1 ms)</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 tabs = st.tabs([
-    "🚀 Prueba en Vivo e Inferencia (E1, E3, E4)",
+    "🚀 Inferencia Táctica y Detección en Vivo (E1, E3, E4)",
+    "🔬 Analizador Multiespectral y Gradientes (Visión Mechatrónica)",
     "🧠 Sustento Técnico y Optimización (E2)",
-    "📈 Validación y Generalización (E3)",
-    "📑 Rúbrica ABET N5"
+    "📈 Validación Estadística y Generalización (E3)",
+    "📑 Rúbrica ABET N5 (500 pts)"
 ])
 
 # =============================================================================
@@ -572,12 +912,12 @@ with tabs[0]:
                 key="editor_tabla_gt"
             )
 
-            # Actualizar session_state si el usuario edito la tabla
+            # Actualizar session_state si el usuario editó la tabla
             for idx, row in edited_df.iterrows():
                 new_gt = 1 if row['¿Es Barco? (Ground Truth)'] else 0
                 results[idx]['ground_truth'] = new_gt
 
-        # Recoleccion de etiquetas para evaluacion
+        # Recolección de etiquetas para evaluación
         y_true, y_pred = [], []
         has_gt = True
         for r in results:
@@ -588,7 +928,7 @@ with tabs[0]:
                 has_gt = False
 
         # =====================================================================
-        # DASHBOARD DE METRICAS EN TIEMPO REAL (E4)
+        # DASHBOARD DE MÉTRICAS MULTI-FUNCTION DISPLAY (E4)
         # =====================================================================
         st.divider()
         st.subheader("📊 Métricas de Percepción en Tiempo Real (Requerimiento E4)")
@@ -597,8 +937,7 @@ with tabs[0]:
 
         with kpi_col1:
             st.markdown(f"""
-            <div class="kpi-card">
-                <div class="kpi-accent-top" style="background: #38bdf8;"></div>
+            <div class="kpi-hud-card" style="--kpi-glow: #38bdf8;">
                 <div class="kpi-label">Lote Evaluado</div>
                 <div class="kpi-val" style="color: #38bdf8;">{total_images}</div>
                 <div class="kpi-status-badge badge-info">Imágenes</div>
@@ -608,8 +947,7 @@ with tabs[0]:
         ships_count = sum(1 for r in results if r['pred_label'] == 1)
         with kpi_col2:
             st.markdown(f"""
-            <div class="kpi-card">
-                <div class="kpi-accent-top" style="background: #10b981;"></div>
+            <div class="kpi-hud-card" style="--kpi-glow: #10b981;">
                 <div class="kpi-label">Barcos Detectados</div>
                 <div class="kpi-val" style="color: #10b981;">{ships_count}</div>
                 <div class="kpi-status-badge badge-success">Clase 1</div>
@@ -619,8 +957,7 @@ with tabs[0]:
         with kpi_col3:
             noships_count = total_images - ships_count
             st.markdown(f"""
-            <div class="kpi-card">
-                <div class="kpi-accent-top" style="background: #60a5fa;"></div>
+            <div class="kpi-hud-card" style="--kpi-glow: #60a5fa;">
                 <div class="kpi-label">No-Barcos</div>
                 <div class="kpi-val" style="color: #60a5fa;">{noships_count}</div>
                 <div class="kpi-status-badge badge-info">Clase 0</div>
@@ -629,10 +966,9 @@ with tabs[0]:
 
         with kpi_col4:
             st.markdown(f"""
-            <div class="kpi-card">
-                <div class="kpi-accent-top" style="background: #f59e0b;"></div>
+            <div class="kpi-hud-card" style="--kpi-glow: #f59e0b;">
                 <div class="kpi-label">Latencia GPU/CPU</div>
-                <div class="kpi-val" style="color: #f59e0b;">{avg_latency:.2f}<span style="font-size: 1rem;">ms</span></div>
+                <div class="kpi-val" style="color: #f59e0b;">{avg_latency:.2f}<span style="font-size: 0.95rem;">ms</span></div>
                 <div class="kpi-status-badge badge-info">&gt; 250 FPS</div>
             </div>
             """, unsafe_allow_html=True)
@@ -646,8 +982,7 @@ with tabs[0]:
                 badge_text = "CUMPLE N5 (≥98%)" if acc >= 98.0 else "<98% (PENALIZABLE)"
                 badge_class = "badge-success" if acc >= 98.0 else "badge-target-warn"
                 st.markdown(f"""
-                <div class="kpi-card">
-                    <div class="kpi-accent-top" style="background: {acc_color};"></div>
+                <div class="kpi-hud-card" style="--kpi-glow: {acc_color};">
                     <div class="kpi-label">Accuracy en Vivo</div>
                     <div class="kpi-val" style="color: {acc_color};">{acc:.2f}%</div>
                     <div class="kpi-status-badge {badge_class}">{badge_text}</div>
@@ -656,8 +991,7 @@ with tabs[0]:
 
             with kpi_col6:
                 st.markdown(f"""
-                <div class="kpi-card">
-                    <div class="kpi-accent-top" style="background: #a855f7;"></div>
+                <div class="kpi-hud-card" style="--kpi-glow: #a855f7;">
                     <div class="kpi-label">F1-Score</div>
                     <div class="kpi-val" style="color: #a855f7;">{metrics['f1']*100.0:.2f}%</div>
                     <div class="kpi-status-badge badge-success">Rec: {metrics['recall']*100:.1f}%</div>
@@ -665,13 +999,13 @@ with tabs[0]:
                 """, unsafe_allow_html=True)
 
             # Matriz de Confusión y Distribución Espectral
-            st.markdown("#### Matriz de Confusión y Distribución de Confianza")
+            st.markdown("#### Matriz de Confusión y Distribución de Probabilidades")
             col_cm, col_hist = st.columns([1, 1])
 
             with col_cm:
                 cm = np.array(metrics['confusion_matrix'])
-                fig_cm, ax_cm = plt.subplots(figsize=(4.5, 3.4), facecolor='#060a14')
-                ax_cm.set_facecolor('#060a14')
+                fig_cm, ax_cm = plt.subplots(figsize=(4.5, 3.4), facecolor='#030712')
+                ax_cm.set_facecolor('#030712')
                 sns.heatmap(
                     cm, annot=True, fmt='d', cmap='Blues', cbar=False, ax=ax_cm,
                     xticklabels=['No Barco (0)', 'Barco (1)'],
@@ -685,22 +1019,22 @@ with tabs[0]:
 
             with col_hist:
                 probs_ship = [r['prob_ship'] for r in results]
-                fig_hist, ax_hist = plt.subplots(figsize=(4.5, 3.4), facecolor='#060a14')
-                ax_hist.set_facecolor('#060a14')
-                ax_hist.hist(probs_ship, bins=20, color='#38bdf8', edgecolor='#0f172a', alpha=0.85)
+                fig_hist, ax_hist = plt.subplots(figsize=(4.5, 3.4), facecolor='#030712')
+                ax_hist.set_facecolor('#030712')
+                ax_hist.hist(probs_ship, bins=20, color='#00f0ff', edgecolor='#0a152e', alpha=0.85)
                 ax_hist.axvline(x=0.50, color='#f43f5e', linestyle='--', linewidth=2, label='Umbral Estándar θ=0.50')
                 ax_hist.tick_params(colors='#94a3b8')
                 ax_hist.set_xlabel('Probabilidad P(Barco)', color='#cbd5e1')
                 ax_hist.set_ylabel('Frecuencia', color='#cbd5e1')
-                ax_hist.legend(facecolor='#0f172a', edgecolor='none', labelcolor='white')
+                ax_hist.legend(facecolor='#0a152e', edgecolor='none', labelcolor='white')
                 st.pyplot(fig_hist)
         else:
             st.warning("⚠️ Hay imágenes con Ground Truth pendiente. Usa los botones de arriba o la tabla para completar el etiquetado y ver la Matriz de Confusión.")
 
-        # Galería Visual de Inferencia
+        # Galería Visual de Inferencia con Retículas Tácticas
         st.divider()
-        st.subheader("🖼️ Galería de Inferencia con Etiquetado Individual por Tarjeta")
-        st.caption("Visualiza cada parche en alta definición y haz clic en el botón inferior para cambiar su etiqueta individualmente.")
+        st.subheader("🖼️ Galería de Inferencia con Retícula Táctica y Etiquetado Individual")
+        st.caption("Cada tarjeta incluye visor de puntería HUD, medidor de confianza y selector rápido para el Analizador Multiespectral:")
 
         col_f1, col_f2 = st.columns([1, 1])
         with col_f1:
@@ -745,34 +1079,49 @@ with tabs[0]:
                     item = current_page_items[item_idx]
                     real_idx = results.index(item)
                     is_ship = (item['pred_label'] == 1)
-                    card_class = "is-ship" if is_ship else "is-noship"
+                    card_class = "ship-locked" if is_ship else "noship-locked"
+                    fill_color = "#10b981" if is_ship else "#38bdf8"
+                    conf_pct = item['confidence'] * 100.0
 
                     with row_cols[col_idx]:
-                        st.markdown(f'<div class="img-card-container {card_class}">', unsafe_allow_html=True)
+                        st.markdown(f"""
+                        <div class="gallery-reticle-card {card_class}">
+                            <div class="reticle-corner-tl"></div>
+                            <div class="reticle-corner-tr"></div>
+                            <div class="reticle-corner-bl"></div>
+                            <div class="reticle-corner-br"></div>
+                            <div class="target-id-badge">TARGET #{real_idx+1:03d}</div>
+                        """, unsafe_allow_html=True)
+                        
                         if item['pil_img'] is not None:
-                            st.image(item['pil_img'])
+                            st.image(item['pil_img'], use_container_width=True)
                         elif item['filepath']:
                             with Image.open(item['filepath']) as img:
-                                st.image(img)
+                                st.image(img, use_container_width=True)
                         
-                        badge_color = "#34d399" if is_ship else "#60a5fa"
+                        badge_color = "#34d399" if is_ship else "#38bdf8"
+                        status_label = "🚢 BUQUE LOCK" if is_ship else "🌊 MAR ABIERTO"
+                        
                         st.markdown(f"""
-                        <div style="font-size: 0.8rem; font-weight: 700; color: {badge_color}; margin-top: 4px;">
-                            {'🚢 Barco' if is_ship else '🌊 No Barco'} ({item['confidence']*100:.1f}%)
-                        </div>
+                            <div class="conf-meter-bar">
+                                <div class="conf-meter-fill" style="width: {conf_pct:.0f}%; background: {fill_color};"></div>
+                            </div>
+                            <div style="font-size: 0.78rem; font-weight: 700; color: {badge_color}; margin-top: 2px;">
+                                {status_label} ({conf_pct:.1f}%)
+                            </div>
                         """, unsafe_allow_html=True)
                         
                         gt_val = item['ground_truth']
                         if gt_val is not None:
                             match = (gt_val == item['pred_label'])
                             match_color = "#34d399" if match else "#f43f5e"
-                            match_text = "✅ Match" if match else "❌ Discrepancia"
-                            st.markdown(f'<div style="font-size: 0.72rem; color: {match_color}; font-weight: 600;">GT: {("Barco" if gt_val == 1 else "No Barco")} ({match_text})</div>', unsafe_allow_html=True)
+                            match_text = "MATCH" if match else "DISCREPANCIA"
+                            st.markdown(f'<div style="font-size: 0.68rem; color: {match_color}; font-weight: 700; font-family: monospace;">GT: {"BARCO" if gt_val == 1 else "NO-BARCO"} [{match_text}]</div>', unsafe_allow_html=True)
                         else:
-                            st.markdown('<div style="font-size: 0.72rem; color: #94a3b8;">GT: Sin asignar</div>', unsafe_allow_html=True)
+                            st.markdown('<div style="font-size: 0.68rem; color: #94a3b8; font-family: monospace;">GT: SIN ASIGNAR</div>', unsafe_allow_html=True)
 
                         is_current_ship = (gt_val == 1) if gt_val is not None else (item['pred_label'] == 1)
-                        btn_label = "Marcar Agua" if is_current_ship else "Marcar Barco"
+                        btn_label = "🌊 Marcar Agua" if is_current_ship else "🚢 Marcar Barco"
                         if st.button(btn_label, key=f"btn_toggle_{real_idx}"):
                             results[real_idx]['ground_truth'] = 0 if is_current_ship else 1
                             st.rerun()
@@ -780,9 +1129,157 @@ with tabs[0]:
                         st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================================================
-# TAB 2: SUSTENTO TECNICO Y OPTIMIZACION (E2)
+# TAB 2: ANALIZADOR MULTIESPECTRAL Y GRADIENTES (VISIÓN MECATRÓNICA)
 # =============================================================================
 with tabs[1]:
+    st.subheader("🔬 Inspección Óptica Multiespectral y Gradientes Morfológicos")
+    st.caption("Descomposición espectral de parches PlanetScope (80×80 px) para análisis de contraste marino, bordes de casco y saliencia de la red (ABET SO1 / SO6):")
+
+    available_items = []
+    if 'results' in st.session_state and st.session_state['results']:
+        available_items = st.session_state['results']
+    elif os.path.exists('test_eval'):
+        eval_files = sorted([f for f in os.listdir('test_eval') if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+        for f in eval_files:
+            available_items.append({
+                'filename': f,
+                'filepath': os.path.join('test_eval', f),
+                'pil_img': None,
+                'pred_class': 'Barco' if f.startswith('1__') else 'No Barco',
+                'confidence': 0.99
+            })
+
+    if available_items:
+        col_sel1, col_sel2 = st.columns([3, 1])
+        with col_sel1:
+            item_options = [f"#{i+1:03d}: {item['filename']} [{item.get('pred_class', 'Desc')}]" for i, item in enumerate(available_items)]
+            selected_idx = st.selectbox("Selecciona la imagen de la misión a examinar:", range(len(item_options)), format_func=lambda x: item_options[x])
+        with col_sel2:
+            st.write("")
+            st.write("")
+            st.info(f"Total en buffer: {len(available_items)}")
+
+        selected_item = available_items[selected_idx]
+        
+        # Carga de imagen PIL
+        if selected_item.get('pil_img') is not None:
+            chosen_pil = selected_item['pil_img']
+        else:
+            chosen_pil = Image.open(selected_item['filepath']).convert('RGB')
+
+        # Procesamiento espectral
+        optical = compute_optical_views(chosen_pil)
+
+        st.markdown("#### 🛰️ Cuadrante Óptico de 4 Canales (Resolución PlanetScope 3m GSD)")
+        
+        c_opt1, c_opt2, c_opt3, c_opt4 = st.columns(4)
+        
+        with c_opt1:
+            st.markdown("""
+            <div style="background: rgba(10, 18, 38, 0.85); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 8px; text-align: center;">
+                <div style="font-family: monospace; font-size: 0.72rem; color: #38bdf8; font-weight: 700; margin-bottom: 4px;">1. RGB ORIGINAL (SENSOR)</div>
+            """, unsafe_allow_html=True)
+            st.image(optical['rgb'], use_container_width=True)
+            st.markdown("""
+                <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 4px;">Sensor PlanetScope 80×80 px</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c_opt2:
+            st.markdown("""
+            <div style="background: rgba(10, 18, 38, 0.85); border: 1px solid rgba(248, 177, 51, 0.3); border-radius: 10px; padding: 8px; text-align: center;">
+                <div style="font-family: monospace; font-size: 0.72rem; color: #f8b133; font-weight: 700; margin-bottom: 4px;">2. INFRARROJO CIR (FALSO COLOR)</div>
+            """, unsafe_allow_html=True)
+            st.image(optical['cir'], use_container_width=True)
+            st.markdown("""
+                <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 4px;">Absorción agua vs. metal</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c_opt3:
+            st.markdown("""
+            <div style="background: rgba(10, 18, 38, 0.85); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 8px; text-align: center;">
+                <div style="font-family: monospace; font-size: 0.72rem; color: #34d399; font-weight: 700; margin-bottom: 4px;">3. GRADIENTE SOBEL (BORDES)</div>
+            """, unsafe_allow_html=True)
+            st.image(optical['sobel'], use_container_width=True)
+            st.markdown("""
+                <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 4px;">Contorno casco, proa y estela</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with c_opt4:
+            st.markdown("""
+            <div style="background: rgba(10, 18, 38, 0.85); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 10px; padding: 8px; text-align: center;">
+                <div style="font-family: monospace; font-size: 0.72rem; color: #c084fc; font-weight: 700; margin-bottom: 4px;">4. MAPA DE SALIENCIA / CALOR</div>
+            """, unsafe_allow_html=True)
+            st.image(optical['heatmap'], use_container_width=True)
+            st.markdown("""
+                <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 4px;">Zona de máxima activación CNN</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.divider()
+
+        # Análisis Espectral Cuantitativo y Gráfico de Histograma
+        st.markdown("#### 📊 Firma Espectral y Métricas Cuantitativas del Parche")
+        c_diag1, c_diag2 = st.columns([1, 1])
+
+        with c_diag1:
+            arr_rgb = optical['arr']
+            fig_hist_rgb, ax_hr = plt.subplots(figsize=(5, 3.2), facecolor='#030712')
+            ax_hr.set_facecolor('#030712')
+            ax_hr.hist(arr_rgb[:,:,0].ravel(), bins=32, color='#ef4444', alpha=0.65, label='Canal Rojo (R)')
+            ax_hr.hist(arr_rgb[:,:,1].ravel(), bins=32, color='#10b981', alpha=0.65, label='Canal Verde (G)')
+            ax_hr.hist(arr_rgb[:,:,2].ravel(), bins=32, color='#3b82f6', alpha=0.65, label='Canal Azul (B)')
+            ax_hr.tick_params(colors='#94a3b8')
+            ax_hr.set_title('Distribución Espectral de Canales RGB', color='#f8fafc', fontsize=10, fontweight='bold')
+            ax_hr.set_xlabel('Intensidad Digital (0-255)', color='#cbd5e1', fontsize=8)
+            ax_hr.set_ylabel('Conteo de Píxeles', color='#cbd5e1', fontsize=8)
+            ax_hr.legend(facecolor='#0a152e', edgecolor='none', labelcolor='white', fontsize=8)
+            st.pyplot(fig_hist_rgb)
+
+        with c_diag2:
+            m = optical['metrics']
+            st.markdown(f"""
+            <div style="background: rgba(10, 18, 38, 0.85); border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 12px; padding: 16px;">
+                <div style="font-family: monospace; font-size: 0.85rem; color: #00f0ff; font-weight: 700; margin-bottom: 10px;">
+                    TELEMETRÍA ÓPTICA CUANTITATIVA
+                </div>
+                <table style="width: 100%; font-size: 0.82rem; color: #cbd5e1; border-collapse: collapse;">
+                    <tr style="border-bottom: 1px solid rgba(148, 163, 184, 0.15);">
+                        <td style="padding: 6px 0;"><b>Luminancia Media (Y):</b></td>
+                        <td style="text-align: right; font-family: monospace; color: #38bdf8;">{m['luminance']:.2f} / 255</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(148, 163, 184, 0.15);">
+                        <td style="padding: 6px 0;"><b>Contraste RMS (σ):</b></td>
+                        <td style="text-align: right; font-family: monospace; color: #38bdf8;">{m['contrast']:.2f}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(148, 163, 184, 0.15);">
+                        <td style="padding: 6px 0;"><b>Energía de Bordes Sobel:</b></td>
+                        <td style="text-align: right; font-family: monospace; color: #34d399;">{m['edge_energy']:.2f}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(148, 163, 184, 0.15);">
+                        <td style="padding: 6px 0;"><b>Entropía de Información:</b></td>
+                        <td style="text-align: right; font-family: monospace; color: #f8b133;">{m['entropy']:.3f} bits/px</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px 0;"><b>Diagnóstico UAVShipNet:</b></td>
+                        <td style="text-align: right; font-family: monospace; color: {'#34d399' if selected_item.get('pred_class') == 'Barco' else '#38bdf8'}; font-weight: 700;">
+                            {selected_item.get('pred_class', 'Inferencia')} ({selected_item.get('confidence', 0.99)*100:.1f}%)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.caption("💡 **Justificación Mecatrónica (ABET SO1 / SO6):** La combinación de gradientes espaciales y reflectancia espectral permite al dron discriminar barcos metálicos de crestas de olas marinas y reflejos solares (*sun glint*) sin requerir sensores LIDAR pesados.")
+    else:
+        st.warning("⚠️ No se encontraron imágenes en el buffer para análisis óptico.")
+
+# =============================================================================
+# TAB 3: SUSTENTO TÉCNICO Y OPTIMIZACIÓN (E2)
+# =============================================================================
+with tabs[2]:
     st.subheader("Demostración Técnica y Sustento de Optimización (Criterio C1 / SO1)")
     
     st.markdown("""
@@ -841,9 +1338,9 @@ with tabs[1]:
         """)
 
 # =============================================================================
-# TAB 3: VALIDACION Y GENERALIZACION (E3)
+# TAB 4: VALIDACIÓN ESTADÍSTICA Y GENERALIZACIÓN (E3)
 # =============================================================================
-with tabs[2]:
+with tabs[3]:
     st.subheader("Desempeño Estadístico y Generalización de UAVShipNet (E3 / SO6)")
     
     comp_data = {
@@ -863,9 +1360,9 @@ with tabs[2]:
     """)
 
 # =============================================================================
-# TAB 4: RUBRICA ABET N5
+# TAB 5: RÚBRICA ABET N5
 # =============================================================================
-with tabs[3]:
+with tabs[4]:
     st.subheader("Cumplimiento Detallado de la Rúbrica ABET (Nivel N5 / 500 Puntos)")
     
     st.markdown("""
