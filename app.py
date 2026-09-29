@@ -895,7 +895,7 @@ with tabs[0]:
                 chosen_dir = browse_directory_native()
                 if chosen_dir:
                     st.session_state['pending_folder_path'] = chosen_dir
-                    st.session_state['force_inference'] = True
+                    st.session_state.pop('results', None)
                     st.rerun()
         with col_p3:
             st.write("")
@@ -933,16 +933,15 @@ with tabs[0]:
     forced = st.session_state.pop('force_inference', False)
     need_run = False
 
+    # Limpiar resultados si el usuario cambió de carpeta o de modo y no ha presionado ejecutar inferencia
+    current_source = target_folder if source_type == "folder" else "upload"
+    if 'active_source_path' in st.session_state and st.session_state['active_source_path'] != current_source:
+        if not execute_inference:
+            st.session_state.pop('results', None)
+            st.session_state.pop('active_source_path', None)
+
+    # La inferencia ÚNICAMENTE se ejecuta bajo orden explícita del usuario
     if forced or execute_inference:
-        need_run = True
-    elif 'results' not in st.session_state:
-        need_run = True
-    elif source_type == "folder" and target_folder and target_folder != st.session_state.get('active_source_path'):
-        if os.path.isdir(target_folder):
-            valid_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
-            if any(f.lower().endswith(valid_exts) for f in os.listdir(target_folder)):
-                need_run = True
-    elif source_type == "upload" and uploaded_files and st.session_state.get('active_source_path') != 'upload':
         need_run = True
 
     if need_run:
@@ -1460,6 +1459,59 @@ with tabs[0]:
                             st.rerun()
 
                         st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        # PANTALLA DE ESPERA OPERACIONAL (STANDBY) - ESPERANDO ORDEN DE INFERENCIA
+        st.markdown("---")
+        
+        # Conteo de imágenes disponibles para informar al usuario
+        pending_count = 0
+        if source_type == "folder" and target_folder and os.path.isdir(target_folder):
+            valid_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
+            pending_count = len([f for f in os.listdir(target_folder) if f.lower().endswith(valid_exts)])
+        elif source_type == "upload" and uploaded_files:
+            pending_count = len(uploaded_files)
+
+        col_sb1, col_sb2 = st.columns([1.2, 2.2])
+        
+        with col_sb1:
+            st.markdown("""
+            <div style="background: rgba(14, 9, 32, 0.95); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 12px; padding: 22px 16px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.7);">
+                <div style="font-family: 'Chakra Petch', sans-serif; font-size: 0.85rem; font-weight: 700; color: #f8b133; letter-spacing: 0.1em; text-transform: uppercase;">
+                    🛰️ SENSOR EN ESPERA (STANDBY)
+                </div>
+                <div style="margin: 18px auto; width: 140px; height: 140px; border-radius: 50%; border: 2px dashed rgba(168, 85, 247, 0.6); position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%);">
+                    <div style="width: 95px; height: 95px; border-radius: 50%; border: 1px solid rgba(0, 240, 255, 0.4);"></div>
+                    <div style="width: 45px; height: 45px; border-radius: 50%; border: 1px solid rgba(52, 211, 153, 0.5);"></div>
+                    <div style="position: absolute; width: 100%; height: 2px; background: rgba(0, 240, 255, 0.25);"></div>
+                    <div style="position: absolute; height: 100%; width: 2px; background: rgba(0, 240, 255, 0.25);"></div>
+                    <div style="position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #00f0ff; box-shadow: 0 0 12px #00f0ff;"></div>
+                </div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #a5b4fc; font-weight: 600;">
+                    ESTADO: LISTO PARA INFERENCIA
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with col_sb2:
+            source_desc = os.path.basename(target_folder) if target_folder else 'Archivos en memoria'
+            st.markdown(f"""
+            <div style="background: rgba(14, 9, 32, 0.95); border: 1px solid rgba(0, 240, 255, 0.35); border-radius: 12px; padding: 22px 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.7); height: 100%;">
+                <h4 style="font-family: 'Chakra Petch', sans-serif; color: #00f0ff; margin-top: 0; margin-bottom: 8px;">
+                    🎯 Sistema de Percepción Listo para Misión
+                </h4>
+                <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 14px;">
+                    El clasificador convolucional profundo <b>UAVShipNet</b> (PyTorch 599k params) se encuentra compilado en memoria y a la espera de la orden de evaluación.
+                </p>
+                <div style="background: rgba(7, 4, 15, 0.75); border-left: 3px solid #00f0ff; border-radius: 4px; padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #e0e7ff; margin-bottom: 16px;">
+                    • <b>Lote en Cola:</b> {pending_count} imágenes satelitales verificadas.<br>
+                    • <b>Umbral Fijo Operacional:</b> &theta; = 0.50 (Estándar de decisión).<br>
+                    • <b>Origen Seleccionado:</b> {source_desc}.
+                </div>
+                <p style="font-size: 0.86rem; color: #f8b133; font-weight: 700; margin: 0;">
+                    👉 Presiona el botón <b>'⚡ Ejecutar Inferencia en Vivo'</b> o <b>'⚡ Cargar y Evaluar'</b> arriba para iniciar la clasificación y desplegar los resultados.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
 
 # =============================================================================
 # TAB 2: ANALIZADOR MULTIESPECTRAL Y GRADIENTES (VISIÓN MECATRÓNICA)
