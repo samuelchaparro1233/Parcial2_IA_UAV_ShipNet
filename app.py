@@ -119,6 +119,22 @@ st.markdown("""
         height: 3px;
         background: linear-gradient(90deg, #f8b133, #a855f7, #00f0ff, #10b981);
     }
+    .hero-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent 0%, rgba(0, 240, 255, 0.04) 40%, rgba(168, 85, 247, 0.12) 60%, transparent 100%);
+        animation: hero-laser-scan 7s ease-in-out infinite;
+        pointer-events: none;
+    }
+    @keyframes hero-laser-scan {
+        0% { left: -100%; }
+        45% { left: 100%; }
+        100% { left: 100%; }
+    }
     .hero-title {
         font-family: 'Chakra Petch', sans-serif;
         font-size: 2.2rem;
@@ -329,6 +345,15 @@ st.markdown("""
         height: 3px;
         background: var(--kpi-glow, #a855f7);
         box-shadow: 0 0 12px var(--kpi-glow, #a855f7);
+    }
+    .kpi-hud-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0; right: 0;
+        width: 10px; height: 10px;
+        border-bottom: 2px solid var(--kpi-glow, #a855f7);
+        border-right: 2px solid var(--kpi-glow, #a855f7);
+        opacity: 0.75;
     }
     .kpi-val {
         font-family: 'JetBrains Mono', monospace;
@@ -1479,12 +1504,16 @@ with tabs[0]:
                 <div style="font-family: 'Chakra Petch', sans-serif; font-size: 0.85rem; font-weight: 700; color: #f8b133; letter-spacing: 0.1em; text-transform: uppercase;">
                     🛰️ SENSOR EN ESPERA (STANDBY)
                 </div>
-                <div style="margin: 18px auto; width: 140px; height: 140px; border-radius: 50%; border: 2px dashed rgba(168, 85, 247, 0.6); position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%);">
-                    <div style="width: 95px; height: 95px; border-radius: 50%; border: 1px solid rgba(0, 240, 255, 0.4);"></div>
-                    <div style="width: 45px; height: 45px; border-radius: 50%; border: 1px solid rgba(52, 211, 153, 0.5);"></div>
-                    <div style="position: absolute; width: 100%; height: 2px; background: rgba(0, 240, 255, 0.25);"></div>
-                    <div style="position: absolute; height: 100%; width: 2px; background: rgba(0, 240, 255, 0.25);"></div>
-                    <div style="position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #00f0ff; box-shadow: 0 0 12px #00f0ff;"></div>
+                <div class="radar-scope" style="width: 140px; height: 140px; margin: 14px auto 12px auto; box-shadow: 0 0 25px rgba(168, 85, 247, 0.45); border: 2px solid #a855f7;">
+                    <div class="radar-sweep" style="animation-duration: 3.5s;"></div>
+                    <div class="radar-ring r-ring-1"></div>
+                    <div class="radar-ring r-ring-2"></div>
+                    <div class="radar-cross-h"></div>
+                    <div class="radar-cross-v"></div>
+                    <div class="radar-center-blip"></div>
+                    <div class="radar-target-dot r-dot-1"></div>
+                    <div class="radar-target-dot r-dot-2"></div>
+                    <div class="radar-target-dot r-dot-3"></div>
                 </div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #a5b4fc; font-weight: 600;">
                     ESTADO: LISTO PARA INFERENCIA
@@ -1767,3 +1796,35 @@ with tabs[4]:
     | **C1. Metodología y Técnicas de Optimización ML** | 50% | **SO1 / RAE-140:** Uso de técnicas de ML para optimizar un sistema mecatrónico. | Optimización integral: arquitectura ligera para dron, análisis de sensibilidad en umbral de decisión, balance exactitud vs latencia. | **E1:** UI interactiva. <br>**E2:** Sustento teórico, Data Augmentation UAV y Cosine Annealing. |
     | **C2. Evaluación, Validación Cruzada e Inferencia en Vivo** | 50% | **SO6 / RAE-144:** Inferencias sobre el desempeño con pruebas y métricas apropiadas. | Evaluación en vivo en interfaz con **Accuracy > 98%**, contraste con validación cruzada y análisis de matriz de confusión. | **E3:** Inferencia en carpeta desconocida. <br>**E4:** Métricas en tiempo real (Accuracy, Precision, Recall, F1, Matriz de Confusión). |
     """)
+
+# =============================================================================
+# FOOTER AEROESPACIAL TÁCTICO DE CIERRE (UMNG MECATRÓNICA & MISIÓN ROTTERDAM)
+# =============================================================================
+st.markdown("""
+<div style="background: linear-gradient(180deg, rgba(14, 9, 32, 0.85) 0%, rgba(7, 4, 15, 0.98) 100%); border: 1px solid rgba(168, 85, 247, 0.28); border-radius: 14px; padding: 18px 24px; margin-top: 25px; margin-bottom: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #94a3b8; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(168, 85, 247, 0.15);">
+    <div>
+        <div style="color: #f8b133; font-weight: 700; font-size: 0.82rem; font-family: 'Chakra Petch', sans-serif; letter-spacing: 0.06em;">
+            🏛️ UNIVERSIDAD MILITAR NUEVA GRANADA • FACULTAD DE INGENIERÍA
+        </div>
+        <div style="color: #cbd5e1; margin-top: 3px; font-weight: 600;">
+            PROGRAMA DE INGENIERÍA MECATRÓNICA • SISTEMA DE PERCEPCIÓN UAVShipNet Mk.IV
+        </div>
+        <div style="color: #64748b; font-size: 0.7rem; margin-top: 2px;">
+            Inspección y Seguridad Portuaria de Rotterdam (51°55'18"N, 4°29'42"E) • Sensor PlanetScope GSD 3m
+        </div>
+    </div>
+    <div style="text-align: right; display: flex; flex-direction: column; gap: 4px;">
+        <div>
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981;"></span>
+            <span style="color: #34d399; font-weight: 700;"> ENLACE GCS: ACTIVO</span>
+            <span style="color: #64748b;"> | </span>
+            <span style="color: #00f0ff; font-weight: 700;">θ = 0.50</span>
+            <span style="color: #64748b;"> | </span>
+            <span style="color: #c084fc; font-weight: 700;">PyTorch 599k params</span>
+        </div>
+        <div style="color: #64748b; font-size: 0.7rem;">
+            Desarrollado para Evaluación Oficial de Inteligencia Artificial (Criterios ABET C1 y C2)
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
