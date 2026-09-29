@@ -95,9 +95,16 @@ def evaluate(model, dataloader, criterion, device, threshold=0.5):
         'targets': all_targets.tolist()
     }
 
-def run_training_pipeline(epochs=20, batch_size=64, lr=1e-3):
+def run_training_pipeline(epochs=30, batch_size=64, lr=1e-3):
+    # Semillas de reproducibilidad cientifica
+    torch.manual_seed(42)
+    np.random.seed(42)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(42)
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Dispositivo de computo seleccionado: {device}")
+    print(f"Configuracion: {epochs} epocas, batch_size={batch_size}, lr={lr}")
     
     df = pd.read_csv(METADATA_FILE)
     print(f"Cargadas {len(df)} muestras desde {METADATA_FILE}.")
@@ -233,11 +240,22 @@ def run_training_pipeline(epochs=20, batch_size=64, lr=1e-3):
     axes[1].grid(True, linestyle='--', alpha=0.6)
     
     plt.tight_layout()
-    plt.savefig(os.path.join(REPORTS_DIR, 'training_curves.png'), dpi=150)
+    rep_curve = os.path.join(REPORTS_DIR, 'training_curves.png')
+    plt.savefig(rep_curve, dpi=150)
+    # Sincronizar con assets para la GUI y README
+    os.makedirs('assets', exist_ok=True)
+    plt.savefig(os.path.join('assets', 'training_curves.png'), dpi=150)
     plt.close()
-    print(f"Curvas de entrenamiento guardadas en: {os.path.join(REPORTS_DIR, 'training_curves.png')}")
+    print(f"Curvas de entrenamiento guardadas en: {rep_curve} y assets/training_curves.png")
     
     return report_data
 
 if __name__ == '__main__':
-    run_training_pipeline(epochs=18, batch_size=64, lr=1e-3)
+    import argparse
+    parser = argparse.ArgumentParser(description="Entrenamiento de UAVShipNet")
+    parser.add_argument('--epochs', type=int, default=30, help="Numero de epocas (default: 30)")
+    parser.add_argument('--batch-size', type=int, default=64, help="Tamano del batch (default: 64)")
+    parser.add_argument('--lr', type=float, default=1e-3, help="Learning rate inicial (default: 0.001)")
+    args = parser.parse_args()
+
+    run_training_pipeline(epochs=args.epochs, batch_size=args.batch_size, lr=args.lr)
