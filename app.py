@@ -489,6 +489,51 @@ st.markdown("""
         border-top: 2px solid #a855f7 !important;
         box-shadow: 0 -4px 15px rgba(168, 85, 247, 0.2) !important;
     }
+
+    /* Tarjetas de Memoria de Cálculo Matemático */
+    .calc-math-card {
+        background: linear-gradient(135deg, rgba(16, 10, 40, 0.94) 0%, rgba(9, 6, 26, 0.97) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.35);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65), 0 0 15px rgba(139, 92, 246, 0.08);
+        transition: all 0.2s ease;
+    }
+    .calc-math-card:hover {
+        border-color: rgba(0, 240, 255, 0.6);
+        box-shadow: 0 8px 25px rgba(0, 240, 255, 0.15);
+        transform: translateY(-2px);
+    }
+    .calc-math-title {
+        font-family: 'Chakra Petch', sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #00f0ff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+        letter-spacing: 0.02em;
+    }
+    .calc-math-formula {
+        background: rgba(6, 3, 16, 0.85);
+        border-left: 3px solid #a855f7;
+        padding: 10px 14px;
+        border-radius: 6px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.82rem;
+        color: #f8fafc;
+        margin: 8px 0;
+        line-height: 1.45;
+        border: 1px solid rgba(168, 85, 247, 0.2);
+        border-left: 3px solid #a855f7;
+    }
+    .calc-math-sub {
+        font-size: 0.78rem;
+        color: #94a3b8;
+        line-height: 1.45;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -1166,6 +1211,139 @@ with tabs[0]:
                 &nbsp;|&nbsp;● Falsos Negativos (FN): <span style="color: #f43f5e; font-weight: bold;">{metrics['fn']}</span> (Cero buques omitidos)
             </div>
             """, unsafe_allow_html=True)
+
+            # =========================================================================
+            # MEMORIA DE CÁLCULO DETALLADA DE MÉTRICAS (E4 / ABET SO6)
+            # =========================================================================
+            tp = int(metrics['tp'])
+            tn = int(metrics['tn'])
+            fp = int(metrics['fp'])
+            fn = int(metrics['fn'])
+            total_samples = tp + tn + fp + fn
+            specificity = (tn / (tn + fp)) * 100.0 if (tn + fp) > 0 else 0.0
+            fpr = (fp / (tn + fp)) * 100.0 if (tn + fp) > 0 else 0.0
+
+            # Evaluación de la penalización oficial según rúbrica
+            if acc >= 98.0:
+                penalizacion = 0.0
+                nota_estimada = 5.0
+                nota_msg = "✅ CUMPLE META ABET N5 (≥98.0%) — SIN PENALIZACIÓN (NOTA 5.0 / 5.0)"
+                nota_color = "#10b981"
+            else:
+                deficit = 98.0 - acc
+                penalizacion = 0.5 * (deficit / 2.0)
+                nota_estimada = max(0.0, 5.0 - penalizacion)
+                nota_msg = f"⚠️ DÉFICIT DE {deficit:.2f}% RESPECTO A LA META DE 98% (PENALIZACIÓN: -{penalizacion:.2f} PTS)"
+                nota_color = "#f43f5e"
+
+            st.markdown("---")
+            st.markdown("#### 📐 Memoria de Cálculo y Formulación Matemática de Métricas (ABET SO6)")
+            st.caption("Desglose algebraico formal y sustitución numérica directa con los valores de la matriz de contingencia en vivo:")
+
+            calc_c1, calc_c2 = st.columns(2)
+
+            with calc_c1:
+                st.markdown(f"""
+                <div class="calc-math-card">
+                    <div class="calc-math-title">1. Exactitud Global (Accuracy)</div>
+                    <div class="calc-math-sub">Proporción de todas las predicciones correctas sobre el total de imágenes en el lote de inspección:</div>
+                    <div class="calc-math-formula">
+                        <b>Fórmula General:</b><br>
+                        Accuracy = (TP + TN) / (TP + TN + FP + FN)<br><br>
+                        <b>Sustitución Numérica en Vivo:</b><br>
+                        Accuracy = ({tp} + {tn}) / ({tp} + {tn} + {fp} + {fn})<br>
+                        Accuracy = {tp + tn} / {total_samples} = <b>{acc/100:.4f}</b> &rarr; <span style="color: {acc_color}; font-weight: bold; font-size: 1.05rem;">{acc:.2f}%</span>
+                    </div>
+                    <div class="calc-math-sub" style="color: #cbd5e1; margin-top: 6px;">
+                        📌 <b>Meta Rúbrica ABET N5:</b> &ge; 98.00%. Estado actual: <b style="color: {acc_color};">{'APROBADO CON EXCELENCIA' if acc >= 98.0 else 'INFERIOR AL UMBRAL'}</b>.
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown(f"""
+                <div class="calc-math-card">
+                    <div class="calc-math-title">2. Sensibilidad (Recall / Tasa de Verdaderos Positivos - TPR)</div>
+                    <div class="calc-math-sub">Efectividad del UAV para detectar todos los barcos reales presentes en el puerto (cero omisiones):</div>
+                    <div class="calc-math-formula">
+                        <b>Fórmula General:</b><br>
+                        Recall = TP / (TP + FN)<br><br>
+                        <b>Sustitución Numérica en Vivo:</b><br>
+                        Recall = {tp} / ({tp} + {fn}) = {tp} / {tp + fn if (tp + fn) > 0 else 1}<br>
+                        Recall = <b>{rec/100:.4f}</b> &rarr; <span style="color: {rec_color}; font-weight: bold; font-size: 1.05rem;">{rec:.2f}%</span>
+                    </div>
+                    <div class="calc-math-sub" style="color: #cbd5e1; margin-top: 6px;">
+                        ⚓ <b>Impacto Mecatrónico Operacional:</b> Un FN significa un barco no detectado por el dron, representando un riesgo crítico de seguridad o colisión en la dársena. (FN actuales: <b>{fn}</b>).
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with calc_c2:
+                st.markdown(f"""
+                <div class="calc-math-card">
+                    <div class="calc-math-title">3. Precisión (Precision / Valor Predictivo Positivo - PPV)</div>
+                    <div class="calc-math-sub">Confiabilidad de las alertas de detección emitidas por el sistema embarcado del UAV:</div>
+                    <div class="calc-math-formula">
+                        <b>Fórmula General:</b><br>
+                        Precision = TP / (TP + FP)<br><br>
+                        <b>Sustitución Numérica en Vivo:</b><br>
+                        Precision = {tp} / ({tp} + {fp}) = {tp} / {tp + fp if (tp + fp) > 0 else 1}<br>
+                        Precision = <b>{prec/100:.4f}</b> &rarr; <span style="color: {prec_color}; font-weight: bold; font-size: 1.05rem;">{prec:.2f}%</span>
+                    </div>
+                    <div class="calc-math-sub" style="color: #cbd5e1; margin-top: 6px;">
+                        🚁 <b>Impacto Mecatrónico Operacional:</b> Un FP significa una falsa alarma por oleaje, estelas o muelles que desvía recursos de patrullaje aéreos innecesariamente. (FP actuales: <b>{fp}</b>).
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                st.markdown(f"""
+                <div class="calc-math-card">
+                    <div class="calc-math-title">4. F1-Score Armónico (Media Balanceada P & R)</div>
+                    <div class="calc-math-sub">Media armónica que penaliza desbalances extremos entre Precisión y Sensibilidad:</div>
+                    <div class="calc-math-formula">
+                        <b>Fórmula General:</b><br>
+                        F1 = 2 &times; (Precision &times; Recall) / (Precision + Recall)<br><br>
+                        <b>Sustitución Numérica en Vivo:</b><br>
+                        F1 = 2 &times; ({prec/100:.4f} &times; {rec/100:.4f}) / ({prec/100:.4f} + {rec/100:.4f})<br>
+                        F1 = <b>{f1/100:.4f}</b> &rarr; <span style="color: {f1_color}; font-weight: bold; font-size: 1.05rem;">{f1:.2f}%</span>
+                    </div>
+                    <div class="calc-math-sub" style="color: #cbd5e1; margin-top: 6px;">
+                        ⚖️ <b>Balance Óptimo:</b> Proporciona la métrica más confiable cuando existe asimetría entre buques y fondos marinos.
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            calc_sub1, calc_sub2 = st.columns([1, 1])
+
+            with calc_sub1:
+                st.markdown(f"""
+                <div class="calc-math-card">
+                    <div class="calc-math-title">5. Especificidad (TNR) y Tasa de Falsa Alarma (FPR)</div>
+                    <div class="calc-math-formula">
+                        <b>Especificidad (True Negative Rate):</b><br>
+                        TNR = TN / (TN + FP) = {tn} / ({tn} + {fp}) = <b>{specificity:.2f}%</b><br><br>
+                        <b>Tasa de Falsa Alarma (False Positive Rate):</b><br>
+                        FPR = FP / (TN + FP) = {fp} / ({tn} + {fp}) = <b>{fpr:.2f}%</b>
+                    </div>
+                    <div class="calc-math-sub">Mide la pureza en el rechazo de muelles, boyas y aguas abiertas sin navíos.</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with calc_sub2:
+                st.markdown(f"""
+                <div class="calc-math-card" style="border-color: {nota_color};">
+                    <div class="calc-math-title" style="color: {nota_color};">6. Modelo de Calificación Oficial ABET N5</div>
+                    <div class="calc-math-formula">
+                        <b>Regla de Penalización (0.5 pts por cada 2% debajo de 98.0%):</b><br>
+                        Penalización = 0.5 &times; max(0, 98.0% - Accuracy) / 2.0%<br>
+                        Penalización Actual = <b>{penalizacion:.2f} pts</b><br><br>
+                        <b>Nota Estimada en Prueba de Inferencia:</b><br>
+                        Nota = 5.0 - {penalizacion:.2f} = <span style="color: {nota_color}; font-weight: bold; font-size: 1.15rem;">{nota_estimada:.2f} / 5.0</span>
+                    </div>
+                    <div class="calc-math-sub" style="color: {nota_color}; font-weight: bold;">
+                        {nota_msg}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
         else:
             kpi_p1, kpi_p2, kpi_p3, kpi_p4 = st.columns(4)
             for col, lbl in zip([kpi_p1, kpi_p2, kpi_p3, kpi_p4], ["Accuracy Global", "Precisión (Precision)", "Sensibilidad (Recall)", "F1-Score Armónico"]):
@@ -1178,6 +1356,20 @@ with tabs[0]:
                     </div>
                     """, unsafe_allow_html=True)
             st.warning("⚠️ Hay imágenes con Ground Truth pendiente. Usa los botones de arriba ('Adoptar Predicciones') o la tabla interactiva para completar el etiquetado y ver la Matriz de Confusión.")
+
+            with st.expander("📐 Ver Formulación Matemática de las Métricas (Fórmulas Teóricas)", expanded=False):
+                st.markdown("""
+                <div class="calc-math-card">
+                    <div class="calc-math-title">Fórmulas Matemáticas que se calcularán tras ingresar Ground Truth:</div>
+                    <div class="calc-math-formula">
+                        • <b>Accuracy Global:</b> (TP + TN) / (TP + TN + FP + FN)  [Meta ABET: &ge; 98.00%]<br>
+                        • <b>Precisión (Precision):</b> TP / (TP + FP)  [Resistencia a falsas alarmas de oleaje/muelles]<br>
+                        • <b>Sensibilidad (Recall):</b> TP / (TP + FN)  [Seguridad marítima: detección de todos los barcos reales]<br>
+                        • <b>F1-Score:</b> 2 &times; (Precision &times; Recall) / (Precision + Recall)<br>
+                        • <b>Penalización ABET:</b> 0.5 pts por cada 2.0% de déficit respecto al 98.0%
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
         # Galería Visual de Inferencia con Retículas Tácticas
         st.divider()
@@ -1505,6 +1697,17 @@ with tabs[3]:
     > La red convolucional **UAVShipNet** (desarrollada íntegramente en PyTorch) demuestra una alta capacidad de generalización. 
     > Gracias a la extracción jerárquica de características visuales en sus 4 etapas convolucionales y el empleo de Global Average Pooling, 
     > el modelo supera con holgura la meta exigida por ABET ($\ge 98.0\%$), garantizando alta confiabilidad para misiones autónomas de inspección portuaria.
+    """)
+
+    st.markdown("### 📐 Formulación Matemática de los Descriptores de Desempeño")
+    st.markdown("""
+    | Métrica de Desempeño | Expresión Matemática | Propósito Mecatrónico en Inspección UAV |
+    | :--- | :---: | :--- |
+    | **Exactitud (Accuracy)** | $\\frac{TP + TN}{TP + TN + FP + FN}$ | Mide la fidelidad global de la percepción visual embarcada. Meta ABET: $\\ge 98.00\\%$. |
+    | **Sensibilidad (Recall)** | $\\frac{TP}{TP + FN}$ | Seguridad operativa: tasa de buques localizados (debe ser $\\approx 100\\%$ para no omitir barcos). |
+    | **Precisión (Precision)** | $\\frac{TP}{TP + FP}$ | Eficiencia de patrullaje: evita alertar o desviar el dron ante falsas alarmas (agua, boyas). |
+    | **F1-Score Armónico** | $2 \\times \\frac{\\text{Precision} \\times \\text{Recall}}{\\text{Precision} + \\text{Recall}}$ | Media armónica penalizadora de desequilibrios entre falsas alarmas y omisiones. |
+    | **Especificidad (TNR)** | $\\frac{TN}{TN + FP}$ | Pureza de rechazo de fondos marinos y estructuras portuarias estáticas. |
     """)
 
 # =============================================================================
