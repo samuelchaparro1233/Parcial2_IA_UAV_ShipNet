@@ -884,7 +884,7 @@ with tabs[0]:
         horizontal=True
     )
     
-    execute_inference = False
+    load_triggered = False
     source_type = None
     target_folder = ""
     uploaded_files = []
@@ -893,9 +893,9 @@ with tabs[0]:
         target_folder = os.path.abspath('test_eval')
         file_count = len(os.listdir(target_folder)) if os.path.exists(target_folder) else 0
         st.info(f"📁 **Ruta asignada:** `{target_folder}` ({file_count} imágenes aisladas de prueba ciega, 100% libres de fuga de datos).")
-        col_btn, _ = st.columns([2, 4])
+        col_btn, _ = st.columns([2.5, 3.5])
         with col_btn:
-            execute_inference = st.button("⚡ Ejecutar Inferencia en Vivo", type="primary", key="btn_dedicated")
+            load_triggered = st.button("📥 Cargar Imágenes de 'test_eval'", type="primary", key="btn_dedicated")
         source_type = "folder"
 
     elif load_mode == "📂 Explorar / Ingresar Carpeta Local en Disco":
@@ -920,12 +920,14 @@ with tabs[0]:
                 chosen_dir = browse_directory_native()
                 if chosen_dir:
                     st.session_state['pending_folder_path'] = chosen_dir
+                    st.session_state.pop('loaded_items', None)
                     st.session_state.pop('results', None)
+                    st.session_state['inference_done'] = False
                     st.rerun()
         with col_p3:
             st.write("")
             st.write("")
-            execute_inference = st.button("⚡ Cargar y Evaluar", type="primary", key="btn_browse_folder")
+            load_triggered = st.button("📥 Cargar Carpeta", type="primary", key="btn_browse_folder")
         
         # Validación en tiempo real de la carpeta ingresada
         current_check_path = target_folder.strip()
@@ -934,7 +936,7 @@ with tabs[0]:
                 valid_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
                 found_imgs = [f for f in os.listdir(current_check_path) if f.lower().endswith(valid_exts)]
                 if found_imgs:
-                    st.success(f"📁 **Carpeta verificada:** `{current_check_path}` — **{len(found_imgs)}** imágenes detectadas listas para procesar.")
+                    st.success(f"📁 **Carpeta verificada:** `{current_check_path}` — **{len(found_imgs)}** imágenes detectadas listas para cargar.")
                 else:
                     st.warning(f"⚠️ La carpeta `{current_check_path}` existe pero no contiene imágenes soportadas (.png, .jpg, .jpeg, .bmp, .tif).")
             else:
@@ -949,126 +951,228 @@ with tabs[0]:
             accept_multiple_files=True
         )
         if uploaded_files:
-            st.success(f"✅ {len(uploaded_files)} imágenes cargadas listas para inferencia.")
-            execute_inference = st.button("⚡ Ejecutar Inferencia sobre Archivos", type="primary", key="btn_upload")
+            st.success(f"✅ {len(uploaded_files)} imágenes preparadas.")
+            load_triggered = st.button("📥 Cargar Imágenes Seleccionadas", type="primary", key="btn_upload")
         source_type = "upload"
 
-    # Lógica inteligente de disparo de inferencia
-    fixed_threshold = 0.50
-    forced = st.session_state.pop('force_inference', False)
-    need_run = False
-
-    # Limpiar resultados si el usuario cambió de carpeta o de modo y no ha presionado ejecutar inferencia
+    # Inicialización por defecto en test_eval si el usuario entra por primera vez
     current_source = target_folder if source_type == "folder" else "upload"
-    if 'active_source_path' in st.session_state and st.session_state['active_source_path'] != current_source:
-        if not execute_inference:
-            st.session_state.pop('results', None)
-            st.session_state.pop('active_source_path', None)
+    if 'loaded_items' not in st.session_state:
+        if load_mode == "🎯 Carpeta Dedicada de Evaluación ('test_eval')" and os.path.isdir(target_folder):
+            load_triggered = True
 
-    # La inferencia ÚNICAMENTE se ejecuta bajo orden explícita del usuario
-    if forced or execute_inference:
-        need_run = True
-
-    if need_run:
-        if source_type == "folder" and target_folder:
-            if os.path.isdir(target_folder):
-                valid_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
-                imgs_to_proc = [f for f in os.listdir(target_folder) if f.lower().endswith(valid_exts)]
-                if imgs_to_proc:
-                    with st.spinner(f"Procesando {len(imgs_to_proc)} imágenes de '{os.path.basename(target_folder)}' con UAVShipNet..."):
-                        results, avg_latency = evaluator.predict_folder(target_folder, threshold=fixed_threshold)
-                        st.session_state['results'] = results
-                        st.session_state['avg_latency'] = avg_latency
-                        st.session_state['active_source_path'] = target_folder
-                        st.session_state['active_load_mode'] = load_mode
-                        st.session_state.pop('editor_tabla_gt', None)
-                else:
-                    st.warning(f"La carpeta '{target_folder}' no contiene imágenes con extensiones soportadas.")
-            else:
-                st.error(f"La ruta '{target_folder}' no existe.")
+    # Carga de lote de imágenes (SIN inferencia previa)
+    if load_triggered:
+        new_items = []
+        if source_type == "folder" and target_folder and os.path.isdir(target_folder):
+            valid_exts = ('.png', '.jpg', '.jpeg', '.bmp', '.tif', '.tiff')
+            found_files = sorted([f for f in os.listdir(target_folder) if f.lower().endswith(valid_exts)])
+            for f in found_files:
+                gt = 1 if f.startswith('1__') else (0 if f.startswith('0__') else None)
+                new_items.append({
+                    'filename': f,
+                    'filepath': os.path.join(target_folder, f),
+                    'file_obj': None,
+                    'ground_truth': gt
+                })
         elif source_type == "upload" and uploaded_files:
-            with st.spinner(f"Procesando {len(uploaded_files)} archivos subidos con UAVShipNet..."):
-                results, avg_latency = evaluator.predict_uploaded_files(uploaded_files, threshold=fixed_threshold)
-                st.session_state['results'] = results
-                st.session_state['avg_latency'] = avg_latency
-                st.session_state['active_source_path'] = 'upload'
-                st.session_state['active_load_mode'] = load_mode
-                st.session_state.pop('editor_tabla_gt', None)
+            for uf in uploaded_files:
+                fname = uf.name
+                gt = 1 if fname.startswith('1__') else (0 if fname.startswith('0__') else None)
+                new_items.append({
+                    'filename': fname,
+                    'filepath': None,
+                    'file_obj': uf,
+                    'ground_truth': gt
+                })
 
-    # Presentación de Resultados
-    if 'results' in st.session_state and st.session_state['results']:
+        if new_items:
+            st.session_state['loaded_items'] = new_items
+            st.session_state['loaded_source'] = current_source
+            st.session_state['inference_done'] = False
+            st.session_state.pop('results', None)
+            st.session_state.pop('editor_tabla_gt', None)
+
+    # Limpiar si el usuario cambió de ruta y aún no ha cargado
+    if 'loaded_source' in st.session_state and st.session_state['loaded_source'] != current_source:
+        if not load_triggered:
+            st.session_state.pop('loaded_items', None)
+            st.session_state.pop('loaded_source', None)
+            st.session_state.pop('results', None)
+            st.session_state['inference_done'] = False
+
+    # =========================================================================
+    # FASE DE ETIQUETADO E INFERENCIA BAJO DEMANDA
+    # =========================================================================
+    if 'loaded_items' in st.session_state and st.session_state['loaded_items']:
+        loaded_items = st.session_state['loaded_items']
+        total_loaded = len(loaded_items)
+
+        # ---------------------------------------------------------------------
+        # PASO 1: MÓDULO DE ETIQUETADO EXPERTO (HUMAN-IN-THE-LOOP)
+        # ---------------------------------------------------------------------
+        st.divider()
+        st.markdown("### 🏷️ Paso 1: Módulo de Etiquetado Experto (Human-in-the-Loop)")
+        st.caption("Asigne o confirme las etiquetas Ground Truth reales de las imágenes cargadas. **Nota:** Las predicciones de la red neuronal permanecerán en espera y NO se mostrarán hasta que usted decida ejecutar la inferencia en el Paso 2.")
+
+        col_lbl1, col_lbl2, col_lbl3, col_lbl4 = st.columns([2.5, 2, 2, 2])
+        with col_lbl1:
+            if st.button("🏷️ Auto-etiquetar (1__ y 0__)", use_container_width=True):
+                for it in loaded_items:
+                    if it['filename'].startswith('1__'):
+                        it['ground_truth'] = 1
+                    elif it['filename'].startswith('0__'):
+                        it['ground_truth'] = 0
+                if 'results' in st.session_state:
+                    for idx, it in enumerate(loaded_items):
+                        if idx < len(st.session_state['results']):
+                            st.session_state['results'][idx]['ground_truth'] = it['ground_truth']
+                st.rerun()
+        with col_lbl2:
+            if st.button("🚢 Marcar Todas 'Barco'", use_container_width=True):
+                for it in loaded_items:
+                    it['ground_truth'] = 1
+                if 'results' in st.session_state:
+                    for idx, it in enumerate(loaded_items):
+                        if idx < len(st.session_state['results']):
+                            st.session_state['results'][idx]['ground_truth'] = 1
+                st.rerun()
+        with col_lbl3:
+            if st.button("🌊 Marcar Todas 'No Barco'", use_container_width=True):
+                for it in loaded_items:
+                    it['ground_truth'] = 0
+                if 'results' in st.session_state:
+                    for idx, it in enumerate(loaded_items):
+                        if idx < len(st.session_state['results']):
+                            st.session_state['results'][idx]['ground_truth'] = 0
+                st.rerun()
+        with col_lbl4:
+            if st.button("🔄 Reiniciar Etiquetas", use_container_width=True):
+                for it in loaded_items:
+                    it['ground_truth'] = None
+                if 'results' in st.session_state:
+                    for idx, it in enumerate(loaded_items):
+                        if idx < len(st.session_state['results']):
+                            st.session_state['results'][idx]['ground_truth'] = None
+                st.rerun()
+
+        # Editor de Tabla Interactiva para etiquetado individual fila por fila
+        with st.expander("✏️ Editor de Tabla Interactiva (Fila por Fila)", expanded=not st.session_state.get('inference_done', False)):
+            st.markdown("Marca la casilla si la imagen corresponde a un **Barco (Clase 1)**. Desmárcala si es **No Barco / Mar / Costa (Clase 0)**.")
+            table_data = []
+            inference_executed = st.session_state.get('inference_done', False) and 'results' in st.session_state
+
+            for idx, it in enumerate(loaded_items):
+                is_ship = bool(it['ground_truth'] == 1)
+                row_dict = {
+                    'ID': idx + 1,
+                    'Archivo': it['filename'],
+                    '¿Es Barco? (Ground Truth)': is_ship
+                }
+                # Solo si la inferencia ya se corrió, mostramos la predicción de la red para contraste
+                if inference_executed and idx < len(st.session_state['results']):
+                    res = st.session_state['results'][idx]
+                    row_dict['Predicción UAVShipNet'] = res['pred_class']
+                    row_dict['Confianza'] = f"{res['confidence']*100:.1f}%"
+                table_data.append(row_dict)
+
+            df_editor = pd.DataFrame(table_data)
+            col_config = {
+                "¿Es Barco? (Ground Truth)": st.column_config.CheckboxColumn(
+                    "¿Es Barco?",
+                    help="Marca si la imagen contiene un barco de carga",
+                    default=False
+                )
+            }
+            disabled_cols = ["ID", "Archivo"]
+            if "Predicción UAVShipNet" in df_editor.columns:
+                disabled_cols.extend(["Predicción UAVShipNet", "Confianza"])
+
+            edited_df = st.data_editor(
+                df_editor,
+                column_config=col_config,
+                disabled=disabled_cols,
+                hide_index=True,
+                key="editor_tabla_gt"
+            )
+
+            for idx, row in edited_df.iterrows():
+                new_gt = 1 if row['¿Es Barco? (Ground Truth)'] else 0
+                loaded_items[idx]['ground_truth'] = new_gt
+                if 'results' in st.session_state and idx < len(st.session_state['results']):
+                    st.session_state['results'][idx]['ground_truth'] = new_gt
+
+        # Conteo de estado de etiquetado
+        ships_tagged = sum(1 for it in loaded_items if it.get('ground_truth') == 1)
+        noships_tagged = sum(1 for it in loaded_items if it.get('ground_truth') == 0)
+        unassigned = sum(1 for it in loaded_items if it.get('ground_truth') is None)
+
+        st.markdown(f"""
+        <div style="background: rgba(14, 9, 32, 0.7); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 8px; padding: 8px 14px; margin-top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; display: flex; justify-content: space-between; align-items: center;">
+            <span>📦 <b>Lote Cargado:</b> {total_loaded} imágenes</span>
+            <span>🚢 <b>Barcos Asignados:</b> <b style="color: #34d399;">{ships_tagged}</b></span>
+            <span>🌊 <b>No-Barcos Asignados:</b> <b style="color: #38bdf8;">{noships_tagged}</b></span>
+            <span>⏳ <b>Sin Asignar:</b> <b style="color: #f59e0b;">{unassigned}</b></span>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # ---------------------------------------------------------------------
+        # PASO 2: DISPARO DE INFERENCIA
+        # ---------------------------------------------------------------------
+        st.divider()
+        st.markdown("### ⚡ Paso 2: Ejecución de Inferencia y Evaluación en Vivo (SO6 / E3 / E4)")
+
+        if not st.session_state.get('inference_done', False):
+            st.caption("Una vez definidas las etiquetas Ground Truth en el Paso 1, presione el siguiente botón para que la red neuronal **UAVShipNet** analice las imágenes y calcule las métricas de desempeño:")
+            if st.button("🚀 EJECUTAR INFERENCIA CON UAVSHIPNET Y EVALUAR EN VIVO", type="primary", use_container_width=True, key="btn_run_inference"):
+                with st.spinner(f"Analizando {total_loaded} imágenes con UAVShipNet (θ = 0.50)..."):
+                    results = []
+                    total_latency = 0.0
+                    fixed_threshold = 0.50
+                    for it in loaded_items:
+                        img_src = it['filepath'] if it['filepath'] else it['file_obj']
+                        pred_label, prob, lat_ms, pil_img = evaluator.predict_image(img_src, threshold=fixed_threshold)
+                        total_latency += lat_ms
+                        results.append({
+                            'filename': it['filename'],
+                            'filepath': it['filepath'],
+                            'pil_img': pil_img,
+                            'pred_label': pred_label,
+                            'pred_class': 'Barco' if pred_label == 1 else 'No Barco',
+                            'confidence': prob if pred_label == 1 else (1.0 - prob),
+                            'prob_ship': prob,
+                            'ground_truth': it['ground_truth'],
+                            'latency_ms': lat_ms
+                        })
+                    avg_latency = total_latency / len(results) if results else 0.0
+                    st.session_state['results'] = results
+                    st.session_state['avg_latency'] = avg_latency
+                    st.session_state['inference_done'] = True
+                    st.rerun()
+        else:
+            col_inf_done, col_re_inf = st.columns([4, 2])
+            with col_inf_done:
+                st.success("✅ **Inferencia ejecutada con éxito:** Las predicciones de UAVShipNet han sido contrastadas contra las etiquetas Ground Truth.")
+            with col_re_inf:
+                if st.button("🔄 Re-ejecutar Inferencia / Recalcular", key="btn_re_infer"):
+                    st.session_state['inference_done'] = False
+                    st.session_state.pop('results', None)
+                    st.rerun()
+
+    # -------------------------------------------------------------------------
+    # PASO 3: PRESENTACIÓN DE RESULTADOS Y MÉTRICAS (SOLO TRAS INFERENCIA)
+    # -------------------------------------------------------------------------
+    if st.session_state.get('inference_done', False) and 'results' in st.session_state and st.session_state['results']:
         results = st.session_state['results']
         avg_latency = st.session_state['avg_latency']
         total_images = len(results)
+        fixed_threshold = 0.50
 
         # Mapeo consistente con umbral fijo 0.50
         for r in results:
             r['pred_label'] = 1 if r['prob_ship'] >= fixed_threshold else 0
             r['pred_class'] = 'Barco' if r['pred_label'] == 1 else 'No Barco'
             r['confidence'] = r['prob_ship'] if r['pred_label'] == 1 else (1.0 - r['prob_ship'])
-
-        # =====================================================================
-        # SECCION: MODULO DE ETIQUETADO EXPERTO (HUMAN-IN-THE-LOOP)
-        # =====================================================================
-        st.divider()
-        st.subheader("🏷️ Módulo de Etiquetado Experto (Human-in-the-Loop)")
-        st.caption("Define las etiquetas Ground Truth de prueba para contrastar con las predicciones del modelo en tiempo real:")
-
-        col_lbl1, col_lbl2, col_lbl3, col_lbl4 = st.columns([2, 2, 2, 2])
-        with col_lbl1:
-            if st.button("✅ Adoptar Predicciones"):
-                for r in results:
-                    r['ground_truth'] = r['pred_label']
-                st.success("Etiquetas asignadas desde predicciones.")
-                st.rerun()
-        with col_lbl2:
-            if st.button("🚢 Asignar Todas como 'Barco'"):
-                for r in results:
-                    r['ground_truth'] = 1
-                st.rerun()
-        with col_lbl3:
-            if st.button("🌊 Asignar Todas como 'No Barco'"):
-                for r in results:
-                    r['ground_truth'] = 0
-                st.rerun()
-        with col_lbl4:
-            if st.button("🔄 Reiniciar Etiquetas"):
-                for r in results:
-                    r['ground_truth'] = None
-                st.rerun()
-
-        # Editor de Tabla Interactiva para etiquetado individual
-        with st.expander("✏️ Editar Etiquetas en Tabla Interactiva (Fila por Fila)", expanded=False):
-            st.markdown("Marca la casilla si la imagen corresponde a un **Barco**. Los cambios recalculan las métricas al instante.")
-            table_data = []
-            for idx, r in enumerate(results):
-                table_data.append({
-                    'ID': idx + 1,
-                    'Archivo': r['filename'],
-                    'Predicción': r['pred_class'],
-                    'Confianza': f"{r['confidence']*100:.1f}%",
-                    '¿Es Barco? (Ground Truth)': bool(r['ground_truth'] == 1 if r['ground_truth'] is not None else r['pred_label'] == 1)
-                })
-
-            df_editor = pd.DataFrame(table_data)
-            edited_df = st.data_editor(
-                df_editor,
-                column_config={
-                    "¿Es Barco? (Ground Truth)": st.column_config.CheckboxColumn(
-                        "¿Es Barco?",
-                        help="Marca si la imagen contiene un barco",
-                        default=False
-                    )
-                },
-                disabled=["ID", "Archivo", "Predicción", "Confianza"],
-                hide_index=True,
-                key="editor_tabla_gt"
-            )
-
-            # Actualizar session_state si el usuario editó la tabla
-            for idx, row in edited_df.iterrows():
-                new_gt = 1 if row['¿Es Barco? (Ground Truth)'] else 0
-                results[idx]['ground_truth'] = new_gt
 
         # Recolección de etiquetas para evaluación
         y_true, y_pred = [], []
