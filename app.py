@@ -971,7 +971,7 @@ with tabs[0]:
                 gt = 1 if f.startswith('1__') else (0 if f.startswith('0__') else None)
                 new_items.append({
                     'filename': f,
-                    'filepath': os.path.join(target_folder, f),
+                    'filepath': os.path.abspath(os.path.join(target_folder, f)),
                     'file_obj': None,
                     'ground_truth': gt
                 })
@@ -1130,7 +1130,20 @@ with tabs[0]:
                     total_latency = 0.0
                     fixed_threshold = 0.50
                     for it in loaded_items:
-                        img_src = it['filepath'] if it['filepath'] else it['file_obj']
+                        img_path = it.get('filepath')
+                        if img_path and os.path.exists(img_path):
+                            img_src = img_path
+                        elif it.get('file_obj'):
+                            img_src = it.get('file_obj')
+                        else:
+                            # Buscar en directorios conocidos
+                            fname = it.get('filename', '')
+                            alts = [
+                                os.path.abspath(fname),
+                                os.path.join(os.getcwd(), 'test_eval', fname),
+                                os.path.join(os.getcwd(), 'data', 'raw', fname)
+                            ]
+                            img_src = next((a for a in alts if os.path.exists(a)), fname)
                         pred_label, prob, lat_ms, pil_img = evaluator.predict_image(img_src, threshold=fixed_threshold)
                         total_latency += lat_ms
                         results.append({

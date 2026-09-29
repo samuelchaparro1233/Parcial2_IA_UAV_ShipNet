@@ -57,14 +57,30 @@ class ShipClassifierEvaluator:
         """
         t0 = time.perf_counter()
         
-        if isinstance(image_input, str):
+        pil_img = None
+        if isinstance(image_input, Image.Image):
+            pil_img = image_input.convert('RGB')
+        elif isinstance(image_input, str):
+            clean_path = image_input.strip().strip('"').strip("'")
+            if not os.path.exists(clean_path):
+                alt_paths = [
+                    os.path.abspath(clean_path),
+                    os.path.join(os.getcwd(), clean_path),
+                    os.path.join('test_eval', os.path.basename(clean_path)),
+                    os.path.join('data', 'raw', os.path.basename(clean_path))
+                ]
+                for ap in alt_paths:
+                    if os.path.exists(ap):
+                        clean_path = ap
+                        break
+            with Image.open(clean_path) as img:
+                pil_img = img.convert('RGB')
+        else:
+            # File-like object (BytesIO, UploadedFile, etc.)
+            if hasattr(image_input, 'seek'):
+                image_input.seek(0)
             with Image.open(image_input) as img:
                 pil_img = img.convert('RGB')
-        elif isinstance(image_input, Image.Image):
-            pil_img = image_input.convert('RGB')
-        else:
-            # File-like object (ej. BytesIO de streamlit file_uploader)
-            pil_img = Image.open(image_input).convert('RGB')
             
         tensor = self.transform(pil_img).unsqueeze(0).to(self.device)
         with torch.no_grad():
