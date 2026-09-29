@@ -1223,19 +1223,6 @@ with tabs[0]:
             specificity = (tn / (tn + fp)) * 100.0 if (tn + fp) > 0 else 0.0
             fpr = (fp / (tn + fp)) * 100.0 if (tn + fp) > 0 else 0.0
 
-            # Evaluación de la penalización oficial según rúbrica
-            if acc >= 98.0:
-                penalizacion = 0.0
-                nota_estimada = 5.0
-                nota_msg = "✅ CUMPLE META ABET N5 (≥98.0%) — SIN PENALIZACIÓN (NOTA 5.0 / 5.0)"
-                nota_color = "#10b981"
-            else:
-                deficit = 98.0 - acc
-                penalizacion = 0.5 * (deficit / 2.0)
-                nota_estimada = max(0.0, 5.0 - penalizacion)
-                nota_msg = f"⚠️ DÉFICIT DE {deficit:.2f}% RESPECTO A LA META DE 98% (PENALIZACIÓN: -{penalizacion:.2f} PTS)"
-                nota_color = "#f43f5e"
-
             st.markdown("---")
             st.markdown("#### 📐 Memoria de Cálculo y Formulación Matemática de Métricas (ABET SO6)")
             st.caption("Desglose algebraico formal y sustitución numérica directa con los valores de la matriz de contingencia en vivo:")
@@ -1255,7 +1242,7 @@ with tabs[0]:
                         Accuracy = {tp + tn} / {total_samples} = <b>{acc/100:.4f}</b> &rarr; <span style="color: {acc_color}; font-weight: bold; font-size: 1.05rem;">{acc:.2f}%</span>
                     </div>
                     <div class="calc-math-sub" style="color: #cbd5e1; margin-top: 6px;">
-                        📌 <b>Meta Rúbrica ABET N5:</b> &ge; 98.00%. Estado actual: <b style="color: {acc_color};">{'APROBADO CON EXCELENCIA' if acc >= 98.0 else 'INFERIOR AL UMBRAL'}</b>.
+                        📌 <b>Meta de Desempeño:</b> &ge; 98.00%. Estado actual: <b style="color: {acc_color};">{'APROBADO CON EXCELENCIA' if acc >= 98.0 else 'INFERIOR AL UMBRAL'}</b>.
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -1317,30 +1304,35 @@ with tabs[0]:
             with calc_sub1:
                 st.markdown(f"""
                 <div class="calc-math-card">
-                    <div class="calc-math-title">5. Especificidad (TNR) y Tasa de Falsa Alarma (FPR)</div>
+                    <div class="calc-math-title">5. Especificidad (TNR / True Negative Rate)</div>
+                    <div class="calc-math-sub">Capacidad del clasificador para identificar correctamente los fondos marinos y zonas libres de buques:</div>
                     <div class="calc-math-formula">
-                        <b>Especificidad (True Negative Rate):</b><br>
-                        TNR = TN / (TN + FP) = {tn} / ({tn} + {fp}) = <b>{specificity:.2f}%</b><br><br>
-                        <b>Tasa de Falsa Alarma (False Positive Rate):</b><br>
-                        FPR = FP / (TN + FP) = {fp} / ({tn} + {fp}) = <b>{fpr:.2f}%</b>
+                        <b>Fórmula General:</b><br>
+                        TNR = TN / (TN + FP)<br><br>
+                        <b>Sustitución Numérica en Vivo:</b><br>
+                        TNR = {tn} / ({tn} + {fp}) = {tn} / {tn + fp if (tn + fp) > 0 else 1}<br>
+                        TNR = <b>{specificity/100:.4f}</b> &rarr; <span style="color: #38bdf8; font-weight: bold; font-size: 1.05rem;">{specificity:.2f}%</span>
                     </div>
-                    <div class="calc-math-sub">Mide la pureza en el rechazo de muelles, boyas y aguas abiertas sin navíos.</div>
+                    <div class="calc-math-sub" style="color: #cbd5e1; margin-top: 6px;">
+                        🌊 <b>Rechazo de Fondos:</b> Pureza en la identificación de aguas abiertas, espigones e instalaciones portuarias fijas.
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
 
             with calc_sub2:
                 st.markdown(f"""
-                <div class="calc-math-card" style="border-color: {nota_color};">
-                    <div class="calc-math-title" style="color: {nota_color};">6. Modelo de Calificación Oficial ABET N5</div>
+                <div class="calc-math-card">
+                    <div class="calc-math-title">6. Tasa de Falsa Alarma (FPR / False Positive Rate)</div>
+                    <div class="calc-math-sub">Proporción de fondos marinos clasificados erróneamente como navíos (1 - Especificidad):</div>
                     <div class="calc-math-formula">
-                        <b>Regla de Penalización (0.5 pts por cada 2% debajo de 98.0%):</b><br>
-                        Penalización = 0.5 &times; max(0, 98.0% - Accuracy) / 2.0%<br>
-                        Penalización Actual = <b>{penalizacion:.2f} pts</b><br><br>
-                        <b>Nota Estimada en Prueba de Inferencia:</b><br>
-                        Nota = 5.0 - {penalizacion:.2f} = <span style="color: {nota_color}; font-weight: bold; font-size: 1.15rem;">{nota_estimada:.2f} / 5.0</span>
+                        <b>Fórmula General:</b><br>
+                        FPR = FP / (TN + FP)<br><br>
+                        <b>Sustitución Numérica en Vivo:</b><br>
+                        FPR = {fp} / ({tn} + {fp}) = {fp} / {tn + fp if (tn + fp) > 0 else 1}<br>
+                        FPR = <b>{fpr/100:.4f}</b> &rarr; <span style="color: #f59e0b; font-weight: bold; font-size: 1.05rem;">{fpr:.2f}%</span>
                     </div>
-                    <div class="calc-math-sub" style="color: {nota_color}; font-weight: bold;">
-                        {nota_msg}
+                    <div class="calc-math-sub" style="color: #cbd5e1; margin-top: 6px;">
+                        🎯 <b>Confiabilidad Operativa:</b> Un FPR bajo ({fpr:.2f}%) certifica mínima distorsión por oleaje o reflejos solares.
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -1360,13 +1352,14 @@ with tabs[0]:
             with st.expander("📐 Ver Formulación Matemática de las Métricas (Fórmulas Teóricas)", expanded=False):
                 st.markdown("""
                 <div class="calc-math-card">
-                    <div class="calc-math-title">Fórmulas Matemáticas que se calcularán tras ingresar Ground Truth:</div>
+                    <div class="calc-math-title">Fórmulas Estadísticas que se calcularán tras ingresar Ground Truth:</div>
                     <div class="calc-math-formula">
-                        • <b>Accuracy Global:</b> (TP + TN) / (TP + TN + FP + FN)  [Meta ABET: &ge; 98.00%]<br>
+                        • <b>Accuracy Global:</b> (TP + TN) / (TP + TN + FP + FN)<br>
+                        • <b>Sensibilidad (Recall):</b> TP / (TP + FN)  [Detección de todos los barcos reales]<br>
                         • <b>Precisión (Precision):</b> TP / (TP + FP)  [Resistencia a falsas alarmas de oleaje/muelles]<br>
-                        • <b>Sensibilidad (Recall):</b> TP / (TP + FN)  [Seguridad marítima: detección de todos los barcos reales]<br>
                         • <b>F1-Score:</b> 2 &times; (Precision &times; Recall) / (Precision + Recall)<br>
-                        • <b>Penalización ABET:</b> 0.5 pts por cada 2.0% de déficit respecto al 98.0%
+                        • <b>Especificidad (TNR):</b> TN / (TN + FP)  [Pureza de rechazo de fondos]<br>
+                        • <b>Tasa de Falsa Alarma (FPR):</b> FP / (TN + FP)
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -1721,9 +1714,4 @@ with tabs[4]:
     | :--- | :---: | :--- | :--- | :--- |
     | **C1. Metodología y Técnicas de Optimización ML** | 50% | **SO1 / RAE-140:** Uso de técnicas de ML para optimizar un sistema mecatrónico. | Optimización integral: arquitectura ligera para dron, análisis de sensibilidad en umbral de decisión, balance exactitud vs latencia. | **E1:** UI interactiva. <br>**E2:** Sustento teórico, Data Augmentation UAV y Cosine Annealing. |
     | **C2. Evaluación, Validación Cruzada e Inferencia en Vivo** | 50% | **SO6 / RAE-144:** Inferencias sobre el desempeño con pruebas y métricas apropiadas. | Evaluación en vivo en interfaz con **Accuracy > 98%**, contraste con validación cruzada y análisis de matriz de confusión. | **E3:** Inferencia en carpeta desconocida. <br>**E4:** Métricas en tiempo real (Accuracy, Precision, Recall, F1, Matriz de Confusión). |
-    
-    ---
-    ### Fórmula de Calificación Oficial:
-    $$\\text{Nota Actividad} = 0.50 \\times C_1 + 0.50 \\times C_2 - \\left(0.5 \\times \\left\\lfloor \\frac{98 - \\text{Accuracy}}{2} \\right\\rfloor\\right)$$
-    * Con un **Accuracy $\\ge 98.0\\%$**, la penalización es **0.0**, asegurando la nota máxima de **5.0 / 5.0**.
     """)
