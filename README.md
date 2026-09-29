@@ -45,9 +45,9 @@ Para garantizar la máxima integridad científica y evitar cualquier fuga de dat
 
 | Subconjunto | Sensor / Plataforma | Composición Semántica | Cantidad | Estado de Aislamiento |
 | :--- | :--- | :--- | :---: | :---: |
-| **Entrenamiento / Validación** | PlanetScope (3m GSD) + Flota Mercante Rotterdam | 1,728 Cargueros + 3,384 Dársenas/Muelles | **5,112** | Empleadas para ajustar los pesos del modelo |
-| **Test Ciego Desconocido (`test_eval/`)** | PlanetScope (3m GSD Nativo) | 100 Buques Mercantes + 100 Fondos Marinos | **200** | **100% Aisladas (Jamás vistas por la red)** |
-| **TOTAL GENERAL** | **Multi-Sensor Global** | **Estandarizado 80×80 px RGB** | **5,312** | **Cero fuga de datos garantizada** |
+| **Entrenamiento / Validación** | PlanetScope (3m GSD) + Flota Mercante Rotterdam | 1,628 Cargueros + 3,284 Dársenas/Muelles | **4,912** | Catalogadas en `dataset_metadata.csv` para entrenamiento |
+| **Test Ciego Desconocido (`test_eval/`)** | PlanetScope (3m GSD Nativo) | 100 Buques Mercantes + 100 Fondos Marinos | **200** | **100% Aisladas físicamente en `test_eval/`** |
+| **POBLACIÓN TOTAL DEL PROYECTO** | **Multi-Sensor Global** | **Estandarizado 80×80 px RGB** | **5,112** | **1,728 Barcos + 3,384 No Barcos (Cero fuga)** |
 
 * **Selección Temática Rotterdam:** Se priorizaron barcos comerciales (portacontenedores, graneleros, petroleros, metaneros GNL y barcazas del Rin), excluyendo por completo embarcaciones de guerra (portaaviones, destructores, fragatas y submarinos).
 
@@ -156,7 +156,7 @@ run_app.bat
 │
 ├── test_eval/                  # 200 imágenes aisladas para la prueba del docente (100% ciegas)
 └── data/
-    └── dataset_metadata.csv    # Catálogo de metadatos de las 5,112 imágenes de entrenamiento
+    └── dataset_metadata.csv    # Catálogo de metadatos de las 4,912 imágenes de entrenamiento
 ```
 
 ---
